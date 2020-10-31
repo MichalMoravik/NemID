@@ -1,10 +1,9 @@
 from flask import request, jsonify
+from datetime import datetime
+import random
 # from __init__.py file import app - for routes (@app.route)
 from nemidapi import app
-from nemidapi.models.user import *
-from nemidapi.models.gender import *
-import random
-from datetime import datetime
+from nemidapi.dbconfig import get_db
 
 
 # HELPERS
@@ -32,17 +31,17 @@ def create_user():
     nem_id = generate_nem_ID_number(cpr)
     
     try:
-        gender = Gender.query.filter_by(Id=gender_id).first()
-        new_user = User(str(email), str(nem_id), str(cpr), str(created_at), str(modified_at), int(gender_id), gender)
-        db.session.add(new_user)
-        db.session.commit()
+        cur = get_db().cursor()
+        cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)'
+                    , (email, nem_id, cpr, created_at, modified_at, gender_id))
+        get_db().commit()
 
     except Exception as e:
         # print(f"******* Error in routes/customers.py: add_customer() *******")
         print(f"Error: {e}")
         return jsonify("Server error: unable to register user. See console for more info."), 500
     else:
-        return user_schema.jsonify(new_user)
+        return jsonify("Success!")
 
 
 # @app.route('/customer', methods=['GET'])

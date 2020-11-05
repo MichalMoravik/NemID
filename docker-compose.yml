@@ -1,0 +1,13 @@
+version: '3'
+services:
+  nemidapi:
+    build: ./NemIDAPI/
+    ports:
+      - 5555:5555
+  sqlite3:
+    image: nouchka/sqlite3:latest
+    volumes:
+      - nemidapi-db:/var/lib/sqlite
+
+volumes:
+  nemidapi-db:

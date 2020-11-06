@@ -11,6 +11,17 @@ CREATE TABLE [User](
 (Id)
 );
 
+CREATE TABLE [Password](
+    [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
+    [CreatedAt] TEXT NOT NULL,
+    [PasswordHash] TEXT NOT NULL,
+    [IsValid] BOOLEAN NOT NULL CHECK (IsValid IN (0,1)),
+    [UserId] INTEGER NOT NULL,
+    FOREIGN KEY
+([UserId]) REFERENCES [User]
+(Id)
+);
+
 CREATE TABLE [Gender](
     [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
     [Label] TEXT NOT NULL

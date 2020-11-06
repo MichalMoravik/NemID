@@ -5,7 +5,7 @@ import random
 from nemidapi import app
 from nemidapi.dbconfig import get_db
 import json
-
+import hashlib
 
 # HELPERS
 def generate_nem_ID_number(cpr: str):
@@ -26,11 +26,12 @@ def generate_nem_ID_number(cpr: str):
 def create_user():
     try:
         email = str(request.json['email']).lower()
-        cpr = str(request.json['cpr']).lower()
+        cpr = str(request.json['cpr'])
         created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         gender_id = int(request.json['genderId'])
-        nem_id = generate_nem_ID_number(cpr)       
+        nem_id = generate_nem_ID_number(cpr) 
+        password_hash = hashlib.sha256(str.encode(request.json['passwordHash'])).hexdigest()
     except Exception as e:
         print(f"************** Error **************: \n{e}")
         return jsonify("Server error: Check JSON spelling, parsing process, or similar!"), 500
@@ -43,8 +44,10 @@ def create_user():
             if record is not None:
                 return jsonify(f'User with CPR {cpr} already exists!'), 403
             
-            cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)'
-                        , (email, nem_id, cpr, created_at, modified_at, gender_id))
+            cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)', 
+                        (email, nem_id, cpr, created_at, modified_at, gender_id))
+            cur.execute('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) VALUES (?,?,?,?)', 
+                        (password_hash, cur.lastrowid, created_at, 1))
             get_db().commit()
         except Exception as e:
             print(f"************** Error **************: \n{e}")

@@ -31,7 +31,7 @@ def create_user():
         modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         gender_id = int(request.json['genderId'])
         nem_id = generate_nem_ID_number(cpr) 
-        password_hash = hashlib.sha256(str.encode(request.json['passwordHash'])).hexdigest()
+        password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
     except Exception as e:
         print(f"************** Error **************: \n{e}")
         return jsonify("Server error: Check JSON spelling, parsing process, or similar!"), 500

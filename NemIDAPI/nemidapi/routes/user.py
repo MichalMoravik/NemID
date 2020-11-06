@@ -4,6 +4,7 @@ import random
 # from __init__.py file import app - for routes (@app.route)
 from nemidapi import app
 from nemidapi.dbconfig import get_db
+import json
 
 
 # HELPERS
@@ -23,83 +24,133 @@ def generate_nem_ID_number(cpr: str):
 
 @app.route('/user', methods=['POST'])
 def create_user():
-    email = request.json['email']
-    cpr = request.json['cpr']
-    created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
-    modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
-    gender_id = request.json['genderId']
-    nem_id = generate_nem_ID_number(cpr)
+    try:
+        email = str(request.json['email']).lower()
+        cpr = str(request.json['cpr']).lower()
+        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+        gender_id = int(request.json['genderId'])
+        nem_id = generate_nem_ID_number(cpr)       
+    except Exception as e:
+        print(f"************** Error **************: \n{e}")
+        return jsonify("Server error: Check JSON spelling, parsing process, or similar!"), 500
+    else:  
+        try:
+            cur = get_db().cursor()
+            
+            cur.execute(f"SELECT * FROM User WHERE CPR=?", (cpr,))
+            record = cur.fetchone()
+            if record is not None:
+                return jsonify(f'User with CPR {cpr} already exists!'), 403
+            
+            cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)'
+                        , (email, nem_id, cpr, created_at, modified_at, gender_id))
+            get_db().commit()
+        except Exception as e:
+            print(f"************** Error **************: \n{e}")
+            return jsonify("Server error: unable to register user!"), 500
+        else:
+            return jsonify(f"User with CPR {cpr} was created!"), 201
+
+
+# Update user
+@app.route('/user/<id>', methods=['PUT'])
+def update_user(id):
+    try:
+        email = str(request.json['email']).lower()
+        cpr = str(request.json['cpr']).lower()
+        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+        gender_id = int(request.json['genderId'])
+        nem_id = generate_nem_ID_number(cpr)
+        id = int(id)       
+    except Exception as e:
+        print(f"************** Error **************: \n{e}")
+        return jsonify("Server error: Check JSON request body spelling, \
+                    parsing process, or similar!"), 500
+    else:  
+        try:
+            cur = get_db().cursor()
+            cur.execute('UPDATE User SET Email=?, CPR=?, ModifiedAt=?, GenderId=?, NemId=?  WHERE Id=?', 
+                        (email, cpr, modified_at, gender_id, nem_id, id, ))
+        except Exception as e:
+            print(f"************** Error **************: \n{e}")
+            return jsonify("Server error: Cannot update user!"), 500
+        else:
+            if cur.rowcount == 1:
+                try:
+                    get_db().commit()
+                except Exception as e:
+                    print(f"************** Error **************: \n{e}")
+                    return jsonify("Server error: Cannot update user!"), 500
+                else:
+                    return jsonify(f'User with id: {id} updated!'), 200
+            return jsonify(f'User with id {id} does not exists!'), 404
+
+
+# Delete user
+@app.route('/user/<id>', methods=['DELETE'])
+def delete_user(id):
+    try:
+        id = int(id)     
+    except Exception as e:
+        print(f"************** Error **************: \n{e}")
+        return jsonify("Server error: This ID could not be parsed to integer!"), 500
+    else:  
+        try:
+            cur = get_db().cursor()
+            cur.execute("DELETE FROM User WHERE Id=?", (id,))
+        except Exception as e:
+            print(f"************** Error **************: \n{e}")
+            return jsonify("Server error: Cannot delete user!"), 500
+        else:
+            if cur.rowcount == 1:
+                try:
+                    get_db().commit()
+                except Exception as e:
+                    print(f"************** Error **************: \n{e}")
+                    return jsonify("Server error: Cannot delete user!"), 500
+                else:
+                    return jsonify(f'User with id: {id} deleted!'), 200
+            return jsonify(f'User with id {id} does not exists!'), 404
     
+
+# Get all users
+@app.route('/user', methods=['GET'])
+def get_users():
     try:
         cur = get_db().cursor()
-        cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)'
-                    , (email, nem_id, cpr, created_at, modified_at, gender_id))
-        get_db().commit()
-
+        cur.execute("SELECT * FROM User")
+        rows = cur.fetchall()
     except Exception as e:
-        # print(f"******* Error in routes/customers.py: add_customer() *******")
-        print(f"Error: {e}")
-        return jsonify("Server error: unable to register user. See console for more info."), 500
+        print(f"************** Error **************: \n{e}")
+        return jsonify("Server error: Cannot get users!"), 500
+    else: 
+        if rows:
+            users = [dict(user) for user in rows]
+            return json.dumps(users), 200
+        return jsonify(f'There are no users in the database!'), 404
+
+# Get one user
+@app.route('/user/<id>', methods=['GET'])
+def get_user(id):
+    try:
+        id = int(id)     
+    except Exception as e:
+        print(f"************** Error **************: \n{e}")
+        return jsonify("Server error: This ID could not be parsed to integer!"), 500
     else:
-        return jsonify("Success!")
-
-
-# @app.route('/customer', methods=['GET'])
-# def get_customers():
-#     try:
-#         all_customers = Customer.query.all()
-#         result = customers_schema.dump(all_customers)
-#         return jsonify(result)
-#     except Exception as e:
-#         print(f"******* Error in routes/customers.py: get_customers() *******")
-#         print(f"Error: {e}")
-#         return jsonify("Cannot get customers!"), 500
-
-
-# @app.route('/customer/<id>', methods=['GET'])
-# def get_customer(id):
-#     try:
-#         customer = Customer.query.get(id)
-#         return customer_schema.jsonify(customer)
-#     except Exception as e:
-#         print(f"******* Error in routes/customers.py: get_customer(id) *******")
-#         print(f"Error: {e}")
-#         return jsonify("Cannot get customer!"), 500
-
-
-# @app.route('/customer/<id>', methods=['PUT'])
-# def update_customer(id):
-#     try:
-#         first_name = request.json['first_name']
-#         last_name = request.json['last_name']
-#         email = request.json['email']
-
-#         customer = Customer.query.get(id)
-#         customer.first_name = first_name
-#         customer.last_name = last_name
-#         customer.email = email
-
-#         db.session.commit()
-
-#         return customer_schema.jsonify(customer)
-#     except Exception as e:
-#         print(f"******* Error in routes/customers.py: update_customer(id) *******")
-#         print(f"Error: {e}")
-#         return jsonify("Cannot update customer!"), 500
-
-
-# @app.route('/customer/<id>', methods=['DELETE'])
-# def delete_customer(id):
-#     try:
-#         customer = Customer.query.get(id)
-#         db.session.delete(customer)
-#         db.session.commit()
-
-#         return customer_schema.jsonify(customer)
-#     except Exception as e:
-#         print(f"******* Error in routes/customers.py: delete_customer(id) *******")
-#         print(f"Error: {e}")
-#         return jsonify("Cannot delete customer!"), 500
+        try:
+            cur = get_db().cursor()
+            cur.execute("SELECT * FROM User WHERE Id=?", (id,))
+            row = cur.fetchone()
+        except Exception as e:
+            print(f"************** Error **************: \n{e}")
+            return jsonify("Server error: Cannot get user!"), 500
+        else:
+            if row is None:
+                return jsonify(f'User with id {id} does not exists'), 404
+            user = dict(row)
+            return json.dumps(user), 200
 
 
 

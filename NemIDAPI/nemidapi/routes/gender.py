@@ -38,14 +38,15 @@ def create_gender():
 @app.route('/gender/<id>', methods=['PUT'])
 def update_gender(id):
     try:
-        label = str(request.json['label']).lower()        
+        label = str(request.json['label']).lower() 
+        id = int(id)
     except Exception as e:
         print(f"************** Error **************: \n{e}")
         return jsonify("Server error: Check JSON spelling, parsing process, or similar!"), 500
     else:  
         try:
             cur = get_db().cursor()
-            cur.execute('UPDATE Gender SET Label = ? WHERE id = ?', (label, id, ))
+            cur.execute('UPDATE Gender SET Label = ? WHERE Id = ?', (label, id, ))
         except Exception as e:
             print(f"************** Error **************: \n{e}")
             return jsonify("Server error: Cannot update gender!"), 500
@@ -115,7 +116,7 @@ def get_gender(id):
     else:
         try:
             cur = get_db().cursor()
-            cur.execute("SELECT * FROM Gender WHERE Id=? ORDER BY ROWID ASC LIMIT 1", (id,))
+            cur.execute("SELECT * FROM Gender WHERE Id=?", (id,))
             row = cur.fetchone()
         except Exception as e:
             print(f"************** Error **************: \n{e}")

@@ -6,23 +6,57 @@ from nemidapi import app
 from nemidapi.dbconfig import get_db
 import json
 import hashlib
+import sqlite3
 
 
-# When receiving POST request, create nemId for the user
-# @app.route('/generate-nemId', methods=['POST'])
-# def generate_nemId():
-#     try:
-#         cpr = request.json['cpr']
-#         nemId = generate_nem_ID_number(cpr)
-#         return jsonify({"nemId": nemId}), 201
+@app.route('/change-password', methods=['POST'])
+def generate_password_nemId():
+    try:
+        nem_ID = str(request.json['nemId'])
+        old_password_hash = hashlib.sha256(str.encode(request.json['oldPassword'])).hexdigest()
+        new_password_hash = hashlib.sha256(str.encode(request.json['newPassword'])).hexdigest()
+        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+    except Exception as e:
+        print(f"************** Error **************: \n{e}")
+        return jsonify("Server error: Check JSON spelling or conversion/hashing!"), 500
+    else:
+        try:
+            cur = get_db().cursor()
+            
+            # select user based on nemID
+            cur.execute("SELECT Id FROM User WHERE NemId=?", (nem_ID,))
+            selected_user = cur.fetchone()
+            if selected_user is None:
+                return jsonify(f'User with this NemID: {nem_ID} does not exist!'), 404
+            selected_user_id = dict(selected_user)["Id"]
+            
+            # check if user's old password matches with old password taken from the request body
+            cur.execute("SELECT PasswordHash FROM Password WHERE UserId=? AND IsValid=?", (selected_user_id,1))
+            selected_password = cur.fetchone()
+            if selected_password is None:
+                return jsonify(f'User with this NemID: {nem_ID} does not have any active password!'), 404
+            selected_password_hash = dict(selected_password)["PasswordHash"]
+            if selected_password_hash != old_password_hash.strip():
+                return jsonify(f'The old password is not correct!'), 403
+            
+            try:
+                commands = [
+                    ('UPDATE Password SET IsValid=? WHERE UserId=? AND IsValid=?', (0, selected_user_id, 1)),
+                    ('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) VALUES (?,?,?,?)',
+                    (new_password_hash, selected_user_id, created_at, 1))]
+                for command in commands:
+                    cur.execute(command[0], command[1])
+                get_db().commit()
+            except sqlite3.OperationalError as e:
+                print(f"************** Error while updating/inserting a new password **************: \n{e}")
+                return jsonify("Server error: could not store the new password!"), 500
+        except Exception as e:
+            print(f"************** Error while communicating with DB **************: \n{e}")
+            return jsonify("Server error: could not change the password!"), 500
+        else:
+            return jsonify("The new password was stored and activated!"), 201
 
-#     except Exception as e:
-#         print(f"******* Error in {script_name} when generating nemId *******")
-#         print(f"Error: {e}")
-#         return jsonify({"server error": "cannot generate nemID"}), 500
 
-    
-    
 # Receives a NemId and password, returns the user if successful, error otherwise
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
@@ -56,3 +90,9 @@ def authenticate():
             else:
                 return jsonify("Incorrect password!"), 403
         
+        
+# will generate a nemId password in this form: {first 2 digits of NemID}{last two digits of CPR}
+def generate_password(cpr, nemId):
+    last_two_digits_cpr = cpr[-2:]
+    first_two_digits_nemId = nemId[:2]
+    return f'{first_two_digits_nemId}{last_two_digits_cpr}'

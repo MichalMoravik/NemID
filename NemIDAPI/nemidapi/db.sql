@@ -34,3 +34,4 @@ INSERT INTO Gender(Label) VALUES ('transgender');
 
 -- INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES ('Michal', '64434-2211', '2604982211', 'October 31, 2020 01:11AM', 'October 31, 2020 01:11AM', 1)
 -- DROP TABLE Gender
+-- DROP TABLE Password

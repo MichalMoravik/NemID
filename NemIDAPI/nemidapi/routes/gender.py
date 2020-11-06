@@ -8,6 +8,8 @@ from nemidapi.dbconfig import get_db
 # 2. validation
 # 3. add everywhere UNIQUE
 # 4. add everywhere comments
+# 5. add transactions everywhere where suitable (where more commands) to avoid expensive communication with DB
+# 6. check if I am unnecessary selecting * instead of a field
 
 @app.route('/gender', methods=['POST'])
 def create_gender():

@@ -30,7 +30,7 @@ def create_user():
         created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         gender_id = int(request.json['genderId'])
-        nem_id = generate_nem_ID_number(cpr) 
+        nem_ID = generate_nem_ID_number(cpr) 
         password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
     except Exception as e:
         print(f"************** Error **************: \n{e}")
@@ -45,7 +45,7 @@ def create_user():
                 return jsonify(f'User with CPR {cpr} already exists!'), 403
             
             cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)', 
-                        (email, nem_id, cpr, created_at, modified_at, gender_id))
+                        (email, nem_ID, cpr, created_at, modified_at, gender_id))
             cur.execute('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) VALUES (?,?,?,?)', 
                         (password_hash, cur.lastrowid, created_at, 1))
             get_db().commit()
@@ -64,7 +64,7 @@ def update_user(id):
         cpr = str(request.json['cpr']).lower()
         modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         gender_id = int(request.json['genderId'])
-        nem_id = generate_nem_ID_number(cpr)
+        nem_ID = generate_nem_ID_number(cpr)
         id = int(id)       
     except Exception as e:
         print(f"************** Error **************: \n{e}")
@@ -74,7 +74,7 @@ def update_user(id):
         try:
             cur = get_db().cursor()
             cur.execute('UPDATE User SET Email=?, CPR=?, ModifiedAt=?, GenderId=?, NemId=?  WHERE Id=?', 
-                        (email, cpr, modified_at, gender_id, nem_id, id, ))
+                        (email, cpr, modified_at, gender_id, nem_ID, id, ))
         except Exception as e:
             print(f"************** Error **************: \n{e}")
             return jsonify("Server error: Cannot update user!"), 500

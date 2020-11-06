@@ -1,13 +1,10 @@
 from flask import request, jsonify
 from datetime import datetime
-import random
 # from __init__.py file import app - for routes (@app.route)
 from nemidapi import app
 from nemidapi.dbconfig import get_db
 import json
 import hashlib
-import sqlite3
-
 
 #reset-password - Receives a CPR and Password -¿ Deactivates all the other passwords for a user and creates a new password
 @app.route('/reset-password', methods=['POST'])
@@ -38,7 +35,7 @@ def reset_password():
                 for command in commands:
                     cur.execute(command[0], command[1])
                 get_db().commit()
-            except sqlite3.OperationalError as e:
+            except Exception as e:
                 print(f"************** Error while updating/inserting a new password **************: \n{e}")
                 return jsonify("Server error: could not store the new password!"), 500
         except Exception as e:
@@ -86,7 +83,7 @@ def change_password():
                 for command in commands:
                     cur.execute(command[0], command[1])
                 get_db().commit()
-            except sqlite3.OperationalError as e:
+            except Exception as e:
                 print(f"************** Error while updating/inserting a new password **************: \n{e}")
                 return jsonify("Server error: could not store the new password!"), 500
         except Exception as e:

@@ -111,7 +111,7 @@ def authenticate():
                 return jsonify(f'User with this NemID: {nem_ID} does not exist!'), 404
             selected_user = dict(selected_user)
             
-            cur.execute("SELECT PasswordHash FROM Password WHERE UserId=?", (selected_user['Id'],))
+            cur.execute("SELECT PasswordHash FROM Password WHERE UserId=? AND IsValid=?", (selected_user['Id'],1))
             selected_password = cur.fetchone()
             if selected_password is None:
                 return jsonify(f'Password for the user with NemID: {nem_ID} does not exist!'), 404

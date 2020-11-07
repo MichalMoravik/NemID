@@ -1,0 +1,21 @@
+CREATE TABLE [Token](
+    [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
+    [AuthAttempt] TEXT NOT NULL,
+    [Token] TEXT NOT NULL,
+    [CreatedAt] TEXT NOT NULL
+);
+
+CREATE TABLE [AuthAttempt](
+    [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
+    [NemId] TEXT NOT NULL,
+    [GeneratedCode] TEXT NOT NULL,
+    [CreatedAt] TEXT NOT NULL
+);
+
+CREATE TABLE [State](
+    [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
+    [Label] TEXT NOT NULL
+);
+
+-- DROP TABLE State
+-- DROP TABLE AuthAttempt

@@ -2,8 +2,7 @@
 - docker
 - add everywhere comments + change error messages
 - add transactions everywhere where suitable (where more commands) to avoid expensive communication with DB
-- check if I am unnecessary selecting * instead of a field
-- HTTPS
+- HTTPS ?
 
 questions:
 - elaborate DB in case 3 pls. FKs are not stated. What is State? How is it connected?

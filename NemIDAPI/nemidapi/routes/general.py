@@ -14,7 +14,7 @@ def reset_password():
         password = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
         created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error *** \n{e}")
         return jsonify("Server error: Check JSON spelling or conversion/hashing!"), 500
     else:
         try:
@@ -36,10 +36,10 @@ def reset_password():
                     cur.execute(command[0], command[1])
                 get_db().commit()
             except Exception as e:
-                print(f"************** Error while updating/inserting a new password **************: \n{e}")
+                print(f"*** Error while updating/inserting a new password *** \n{e}")
                 return jsonify("Server error: could not store the new password!"), 500
         except Exception as e:
-            print(f"************** Error while communicating with DB **************: \n{e}")
+            print(f"*** Error while communicating with DB *** \n{e}")
             return jsonify("Server error: could not reset the password!"), 500
         else:
             return jsonify("The new password was stored and activated!"), 201
@@ -53,7 +53,7 @@ def change_password():
         new_password_hash = hashlib.sha256(str.encode(request.json['newPassword'])).hexdigest()
         created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error *** \n{e}")
         return jsonify("Server error: Check JSON spelling or conversion/hashing!"), 500
     else:
         try:
@@ -84,10 +84,10 @@ def change_password():
                     cur.execute(command[0], command[1])
                 get_db().commit()
             except Exception as e:
-                print(f"************** Error while updating/inserting a new password **************: \n{e}")
+                print(f"*** Error while updating/inserting a new password *** \n{e}")
                 return jsonify("Server error: could not store the new password!"), 500
         except Exception as e:
-            print(f"************** Error while communicating with DB **************: \n{e}")
+            print(f"*** Error while communicating with DB *** \n{e}")
             return jsonify("Server error: could not change the password!"), 500
         else:
             return jsonify("The new password was stored and activated!"), 201
@@ -100,7 +100,7 @@ def authenticate():
         password = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
         nem_ID = request.json['nemId']
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error *** \n{e}")
         return jsonify("Server error: Check JSON spelling!"), 500
     else:
         try:
@@ -118,7 +118,7 @@ def authenticate():
             selected_password_hash = dict(selected_password)['PasswordHash']
             
         except Exception as e:
-            print(f"************** Error **************: \n{e}")
+            print(f"*** Error *** \n{e}")
             return jsonify("Server error: unable to authenticate!"), 500
         else:
             if password == selected_password_hash: 

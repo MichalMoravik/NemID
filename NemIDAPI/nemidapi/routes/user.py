@@ -24,6 +24,11 @@ def generate_nem_ID_number(cpr: str):
 
 @app.route('/user', methods=['POST'])
 def create_user():
+    """Creates new user and stores it in the database.
+
+    Returns:
+        Various json strings and status codes based on different conditions
+    """
     try:
         email = str(request.json['email']).lower()
         cpr = str(request.json['cpr'])
@@ -33,7 +38,7 @@ def create_user():
         nem_ID = generate_nem_ID_number(cpr) 
         password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error in routes/user/create_user() ***: \n{e}")
         return jsonify("Server error: Check JSON spelling, parsing process, or similar!"), 500
     else:  
         try:
@@ -56,15 +61,22 @@ def create_user():
                         (password_hash, cur.lastrowid, created_at, 1))
             get_db().commit()
         except Exception as e:
-            print(f"************** Error **************: \n{e}")
+            print(f"*** Error in routes/user/create_user() ***: \n{e}")
             return jsonify("Server error: unable to register user!"), 500
         else:
             return jsonify(f"User with CPR {cpr} was created!"), 201
 
 
-# Update user
 @app.route('/user/<id>', methods=['PUT'])
 def update_user(id):
+    """Updates the user and stores the new data in the database
+
+    Args:
+        id: taken from the route URL e.g. ...user/1
+
+    Returns:
+        Various json strings and status codes based on different conditions
+    """
     try:
         email = str(request.json['email']).lower()
         cpr = str(request.json['cpr']).lower()
@@ -73,7 +85,7 @@ def update_user(id):
         nem_ID = generate_nem_ID_number(cpr)
         id = int(id)       
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error in routes/user/update_user() ***: \n{e}")
         return jsonify("Server error: Check JSON request body spelling, \
                     parsing process, or similar!"), 500
     else:  
@@ -82,56 +94,67 @@ def update_user(id):
             cur.execute('UPDATE User SET Email=?, CPR=?, ModifiedAt=?, GenderId=?, NemId=?  WHERE Id=?', 
                         (email, cpr, modified_at, gender_id, nem_ID, id, ))
         except Exception as e:
-            print(f"************** Error **************: \n{e}")
+            print(f"*** Error in routes/user/update_user() ***: \n{e}")
             return jsonify("Server error: Cannot update user!"), 500
         else:
             if cur.rowcount == 1:
                 try:
                     get_db().commit()
                 except Exception as e:
-                    print(f"************** Error **************: \n{e}")
+                    print(f"*** Error in routes/user/update_user() ***: \n{e}")
                     return jsonify("Server error: Cannot update user!"), 500
                 else:
                     return jsonify(f'User with id: {id} updated!'), 200
             return jsonify(f'User with id {id} does not exists!'), 404
 
 
-# Delete user
 @app.route('/user/<id>', methods=['DELETE'])
 def delete_user(id):
+    """Removes the user from the database
+
+    Args:
+        id: taken from the route URL e.g. ...user/1
+
+    Returns:
+        Various json strings and status codes based on different conditions
+    """
     try:
         id = int(id)     
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error in routes/user/delete_user() ***: \n{e}")
         return jsonify("Server error: This ID could not be parsed to integer!"), 500
     else:  
         try:
             cur = get_db().cursor()
             cur.execute("DELETE FROM User WHERE Id=?", (id,))
         except Exception as e:
-            print(f"************** Error **************: \n{e}")
+            print(f"*** Error in routes/user/delete_user() ***: \n{e}")
             return jsonify("Server error: Cannot delete user!"), 500
         else:
             if cur.rowcount == 1:
                 try:
                     get_db().commit()
                 except Exception as e:
-                    print(f"************** Error **************: \n{e}")
+                    print(f"*** Error in routes/user/delete_user() ***: \n{e}")
                     return jsonify("Server error: Cannot delete user!"), 500
                 else:
                     return jsonify(f'User with id: {id} deleted!'), 200
             return jsonify(f'User with id {id} does not exists!'), 404
     
 
-# Get all users
 @app.route('/user', methods=['GET'])
 def get_users():
+    """Pulls and returns all users from the database
+
+    Returns:
+        Various json strings and status codes based on different conditions
+    """
     try:
         cur = get_db().cursor()
         cur.execute("SELECT * FROM User")
         rows = cur.fetchall()
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error in routes/user/get_users() ***: \n{e}")
         return jsonify("Server error: Cannot get users!"), 500
     else: 
         if rows:
@@ -139,13 +162,21 @@ def get_users():
             return json.dumps(users), 200
         return jsonify(f'There are no users in the database!'), 404
 
-# Get one user
+
 @app.route('/user/<id>', methods=['GET'])
 def get_user(id):
+    """Pull a specific user from the database
+
+    Args:
+        id: taken from the route URL e.g. ...user/1
+
+    Returns:
+        Various json strings and status codes based on different conditions
+    """
     try:
         id = int(id)     
     except Exception as e:
-        print(f"************** Error **************: \n{e}")
+        print(f"*** Error in routes/user/get_user() ***: \n{e}")
         return jsonify("Server error: This ID could not be parsed to integer!"), 500
     else:
         try:
@@ -153,7 +184,7 @@ def get_user(id):
             cur.execute("SELECT * FROM User WHERE Id=?", (id,))
             row = cur.fetchone()
         except Exception as e:
-            print(f"************** Error **************: \n{e}")
+            print(f"*** Error in routes/user/get_user() ***: \n{e}")
             return jsonify("Server error: Cannot get user!"), 500
         else:
             if row is None:

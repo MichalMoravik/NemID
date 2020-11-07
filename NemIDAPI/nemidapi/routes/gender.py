@@ -9,7 +9,7 @@ def create_gender():
     """Creates a new gender, then stores it in the database
 
     Returns:
-        json string and status code based on different conditions
+        Various json strings and status codes based on different conditions
     """
     try:
         label = str(request.json['label']).lower()        
@@ -42,7 +42,7 @@ def update_gender(id):
         id: taken from the route URL e.g. ...gender/1
 
     Returns:
-        json string and status code based on different conditions
+        Various json strings and status codes based on different conditions
     """
     try:
         label = str(request.json['label']).lower() 
@@ -77,7 +77,7 @@ def delete_gender(id):
         id: taken from the route URL e.g. ...gender/1
 
     Returns:
-        json string and status code based on different conditions
+        Various json strings and status codes based on different conditions
     """
     try:
         id = int(id)     
@@ -108,7 +108,7 @@ def get_genders():
     """Pulls all genders from the database
 
     Returns:
-        json string and status code based on different conditions
+        Various json strings and status codes based on different conditions
     """
     try:
         cur = get_db().cursor()
@@ -132,7 +132,7 @@ def get_gender(id):
         id: taken from the route URL e.g. ...gender/1
 
     Returns:
-        json string and status code based on different conditions
+        Various json strings and status codes based on different conditions
     """
     try:
         id = int(id)     

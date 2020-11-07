@@ -1,11 +1,13 @@
-# 1. check if it exists
-# 2. validation
-# 3. add everywhere UNIQUE
-# 4. add everywhere comments + change error messages
-# 5. add transactions everywhere where suitable (where more commands) to avoid expensive communication with DB
-# 6. check if I am unnecessary selecting * instead of a field
-# 7. HTTPS
+- add everywhere UNIQUE ? 
+- docker
+- add everywhere comments + change error messages
+- add transactions everywhere where suitable (where more commands) to avoid expensive communication with DB
+- check if I am unnecessary selecting * instead of a field
+- HTTPS
 
 questions:
-1. elaborate DB in case 3 pls. FKs are not stated. What is State? How is it connected?
-2. 
+- elaborate DB in case 3 pls. FKs are not stated. What is State? How is it connected?
+- Should I use UNIQUE in SQL and rely on it to not store duplicates or should I make 
+a select statement on the server side and check if the record already exists. Or both? 
+Currently I am checking all the time using select statement
+- So should we select first to see if it exist?

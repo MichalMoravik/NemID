@@ -39,10 +39,16 @@ def create_user():
         try:
             cur = get_db().cursor()
             
-            cur.execute(f"SELECT * FROM User WHERE CPR=?", (cpr,))
+            cur.execute(f"SELECT 1 FROM User WHERE CPR=?", (cpr,))
             record = cur.fetchone()
             if record is not None:
                 return jsonify(f'User with CPR {cpr} already exists!'), 403
+            
+            # check if the assigned gender exists
+            cur.execute(f"SELECT 1 FROM Gender WHERE Id=?", (gender_id,))
+            record = cur.fetchone()
+            if record is None:
+                return jsonify(f'Gender with the gender ID: {gender_id} does not exist!'), 404
             
             cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)', 
                         (email, nem_ID, cpr, created_at, modified_at, gender_id))

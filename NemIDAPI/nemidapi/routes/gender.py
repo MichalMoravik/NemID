@@ -15,8 +15,7 @@ def create_gender():
         try:
             cur = get_db().cursor()
             
-            # getting back the whole row, isn't wasting? check it later
-            cur.execute(f"SELECT * FROM Gender WHERE Label=?", (label,))
+            cur.execute(f"SELECT 1 FROM Gender WHERE Label=?", (label,))
             record = cur.fetchone()
             if record is not None:
                 return jsonify(f'Gender {label} already exists!'), 403

@@ -6,9 +6,7 @@ CREATE TABLE [User](
     [CreatedAt] TEXT NOT NULL,
     [ModifiedAt] TEXT NOT NULL,
     [GenderId] INTEGER NOT NULL,
-    FOREIGN KEY
-([GenderId]) REFERENCES [Gender]
-(Id)
+    FOREIGN KEY([GenderId]) REFERENCES [Gender](Id)
 );
 
 CREATE TABLE [Password](
@@ -17,9 +15,7 @@ CREATE TABLE [Password](
     [PasswordHash] TEXT NOT NULL,
     [IsValid] BOOLEAN NOT NULL CHECK (IsValid IN (0,1)),
     [UserId] INTEGER NOT NULL,
-    FOREIGN KEY
-([UserId]) REFERENCES [User]
-(Id)
+    FOREIGN KEY([UserId]) REFERENCES [User](Id)
 );
 
 CREATE TABLE [Gender](

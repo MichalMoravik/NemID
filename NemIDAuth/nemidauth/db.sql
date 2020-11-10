@@ -1,15 +1,18 @@
 CREATE TABLE [Token](
     [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
-    [AuthAttempt] TEXT NOT NULL,
+    [AuthAttemptId] INTEGER NOT NULL,
     [Token] TEXT NOT NULL,
-    [CreatedAt] TEXT NOT NULL
+    [CreatedAt] TEXT NOT NULL,
+    FOREIGN KEY ([AuthAttemptId]) REFERENCES [AuthAttempt](Id)
 );
 
 CREATE TABLE [AuthAttempt](
     [Id] INTEGER PRIMARY KEY AUTOINCREMENT,
     [NemId] TEXT NOT NULL,
     [GeneratedCode] TEXT NOT NULL,
-    [CreatedAt] TEXT NOT NULL
+    [CreatedAt] TEXT NOT NULL,
+    [StateId] INTEGER NOT NULL,
+    FOREIGN KEY ([StateId]) REFERENCES [State](Id)
 );
 
 CREATE TABLE [State](
@@ -17,5 +20,6 @@ CREATE TABLE [State](
     [Label] TEXT NOT NULL
 );
 
--- DROP TABLE State
--- DROP TABLE AuthAttempt
+-- DROP TABLE State;
+-- DROP TABLE AuthAttempt;
+-- DROP TABLE Token;

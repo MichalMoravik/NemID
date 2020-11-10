@@ -55,10 +55,17 @@ def create_user():
             if record is None:
                 return jsonify(f'Gender with the gender ID: {gender_id} does not exist!'), 404
             
-            cur.execute('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)', 
-                        (email, nem_ID, cpr, created_at, modified_at, gender_id))
-            cur.execute('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) VALUES (?,?,?,?)', 
-                        (password_hash, cur.lastrowid, created_at, 1))
+            # transaction - inserts user and password atomically
+            # in password insertion, the UserId is found by looking 
+            # at the last added and highest Id, which is always the new user.
+            commands = [
+                ('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)', 
+                            (email, nem_ID, cpr, created_at, modified_at, gender_id)),
+                ('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) ' \
+                'SELECT ?, User.Id, ?, ? FROM User ORDER BY Id DESC LIMIT 1', 
+                            (password_hash, created_at, 1))]
+            for command in commands:
+                    cur.execute(command[0], command[1])
             get_db().commit()
         except Exception as e:
             print(f"*** Error in routes/user/create_user() ***: \n{e}")

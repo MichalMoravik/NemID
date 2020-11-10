@@ -34,8 +34,8 @@ def reset_password():
             selected_user_id = dict(selected_user)["Id"]
                 
             try:
-                # Transaction - set IsValid to 0 (false) for the old and active password. 
-                # Then stores and activates a new hashed password
+                # transaction - set IsValid to 0 (false) for the old and active password. 
+                # then stores and activates a new hashed password
                 commands = [
                     ('UPDATE Password SET IsValid=? WHERE UserId=? AND IsValid=?', (0, selected_user_id, 1)),
                     ('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) VALUES (?,?,?,?)',

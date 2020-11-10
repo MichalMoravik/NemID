@@ -20,6 +20,8 @@ CREATE TABLE [State](
     [Label] TEXT NOT NULL
 );
 
+-- INSERT INTO State (Label) VALUES ("pending") , ("successful") , ("failed");
+
 -- DROP TABLE State;
 -- DROP TABLE AuthAttempt;
 -- DROP TABLE Token;

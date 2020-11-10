@@ -6,9 +6,6 @@ from nemidauth.dbconfig import get_db
 import json
 import requests
 
-#/login - Receives a NemId and password, sends a call to the NemID API:
-#If the auth request is successful add it to the database - State pending
-#If the auth request failed - return an error (403 or something)
 @app.route('/login', methods=['POST'])
 def login():
     """Logs in the user by calling NemID API authentication route and passing the data inside.
@@ -24,6 +21,7 @@ def login():
     try:
         nem_id = str(request.json['nemId'])
         password = str(request.json['password'])
+        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/login() *** \n{e}")
         return jsonify("Server error: Check JSON spelling!"), 500
@@ -39,17 +37,21 @@ def login():
             return jsonify("Server error: could not login!"), 500
         else:
             try:
+                # if the authentication went successful, 
+                # then store state and auth attempt in the DB
                 if response.ok:
-                    # STORE IN DB
-                    # cur = get_db().cursor()
-                    # cur.execute('')
-                    pass
+                    cur = get_db().cursor()
+                    # insert a new auth attempt with pending state (stateId 1) to DB
+                    cur.execute('INSERT INTO AuthAttempt(NemId, GeneratedCode, CreatedAt, StateId) VALUES (?,?,?,?)',
+                        (nem_id, "Temporary random words", created_at, 1))
+                    get_db().commit()
             except Exception as e:
-                # EXCEPT IF DB CONNECTION FAILS (only triggered if response is OK (200))
-                pass
+                # except if database commands failed. The database queries can only be triggered 
+                # if response is "ok" and so this exception could only happen if response is "ok".
+                print(f"*** Error in routes/general/login() *** \n{e}")
+                print("User was successfully returned but insertion of the AuthAttempt data failed!")
+                return jsonify("Server error: could not login!"), 500
             else:
-                # RETURN RESPONSE CODE (all possible response codes)
-                # won't be returned if DB connection fails
                 return jsonify (json.loads(response.content)), response.status_code
             
 

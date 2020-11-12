@@ -1,3 +1,13 @@
+Things from requirements plus the following ones:
+
 - add everywhere UNIQUE ? 
 - docker
 - HTTPS ?
+
+BANK:
+- when adding deposit, update money on the bank account too
+- you cannot have a account before having BankUser
+
+SKAT:
+- pay-taxes will call withdrawal endpoint
+

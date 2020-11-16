@@ -11,3 +11,15 @@ BANK:
 SKAT:
 - pay-taxes will call withdrawal endpoint
 
+
+===================================================================
+Mandatory 2  todo.
+ 
+SKAT:
+
+BORGER.DK:
+    - So, I wanted the address and the borgeruser to cascade the delete,
+      but since, foreign_key is not enabled by default in sqlite3, there is
+      some problems with that... have to query the database foreach each reference 
+      with the same user id.. It works though! but could be implemented smarter 
+BANK:

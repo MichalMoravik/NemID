@@ -15,7 +15,7 @@ CREATE TABLE Address (
 ) 
 
 INSERT INTO BorgerUser(UserId, CreatedAt) VALUES ('4dcb3005-c58b-4727-ab04-405b81795cd9', '2020-11-16 22:45:36.185119')
-INSERT INTO Address(Address, CreatedAt, isvalid, BorgerUserId) VALUES ('Katrinedal 16', datetime('now'), 1,12)
+INSERT INTO Address(Address, CreatedAt, isvalid, BorgerUserId) VALUES ('Katrinedal 16', datetime('now'), 1,'a96a60c3-b83c-4476-80dd-79b6916cc396')
 
 DELETE from BorgerUser 
 where UserId = 12

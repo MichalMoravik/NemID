@@ -1,0 +1,15 @@
+###########################
+1. Azure functiions doesnt work with python 3.9 use 3.8.6
+#############################
+2. (windows) create virtualenv
+    * first install virtualenv via pip/pip3 "pip3 install virtualenv"
+    * then run "python -m virtualenv venv" venv is the name of the folder.
+    * navigate with cmd to the folder which venv is place inside
+      and run .\venv\Scripts\activate.bat and voila!
+#############################
+3. Install pip libraries through requirements.txt
+    * "pip install -r requirements.txt"
+#############################
+4. Save pip libraries to requirements.txt
+    * "pip freeze > requirements.txt"
+#############################

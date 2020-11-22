@@ -39,7 +39,7 @@ def create_user():
         password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
     except Exception as e:
         print(f"*** Error in routes/user/create_user() ***: \n{e}")
-        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
+        return jsonify("Check spelling and data types of request body elements!"), 400
     else:  
         try:
             cur = get_db().cursor()
@@ -93,7 +93,7 @@ def update_user(id):
         id = int(id)       
     except Exception as e:
         print(f"*** Error in routes/user/update_user() ***: \n{e}")
-        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
+        return jsonify("Check spelling and data types of request body elements!"), 400
     else:  
         try:
             cur = get_db().cursor()
@@ -128,7 +128,7 @@ def delete_user(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/user/delete_user() ***: \n{e}")
-        return jsonify("Server error: This ID could not be parsed to integer!"), 422
+        return jsonify("This ID could not be parsed to integer!"), 422
     else:  
         try:
             cur = get_db().cursor()
@@ -185,7 +185,7 @@ def get_user(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/user/get_user() ***: \n{e}")
-        return jsonify("Server error: This ID could not be parsed to integer!"), 422
+        return jsonify("This ID could not be parsed to integer!"), 422
     else:
         try:
             cur = get_db().cursor()

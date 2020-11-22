@@ -21,7 +21,7 @@ def create_bank_account():
         modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/account/create_bank_account() ***: \n{e}")
-        return jsonify("Server error: Check spelling and data types of request body elements!"), 400 
+        return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
             cur = get_db().cursor()
@@ -68,7 +68,7 @@ def update_bank_account(id):
         is_student = int(request.json['isStudent'])
     except Exception as e:
         print(f"*** Error in routes/account/update_bank_account() ***: \n{e}")
-        return jsonify("Server error: Check spelling and data types of request body elements!"), 400 
+        return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
             cur = get_db().cursor()

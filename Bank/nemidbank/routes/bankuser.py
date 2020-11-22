@@ -19,7 +19,7 @@ def create_bank_user():
         modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/bankuser/create_bank_user() ***: \n{e}")
-        return jsonify("Server error: Check spelling and data types of request body elements!"), 400 
+        return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
             cur = get_db().cursor()

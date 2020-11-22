@@ -15,7 +15,7 @@ def create_gender():
         label = str(request.json['label']).lower()        
     except Exception as e:
         print(f"*** Error in routes/gender/create_gender() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling, parsing process, or similar!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:  
         try:
             cur = get_db().cursor()
@@ -49,7 +49,7 @@ def update_gender(id):
         id = int(id)
     except Exception as e:
         print(f"*** Error in routes/gender/update_gender() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling, parsing process, or similar!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:  
         try:            
             cur = get_db().cursor()
@@ -83,7 +83,7 @@ def delete_gender(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/gender/delete_gender *** \n{e}")
-        return jsonify("Server error: This ID could not be parsed to integer!"), 500
+        return jsonify("Server error: This ID could not be parsed to integer!"), 422
     else:  
         try:
             cur = get_db().cursor()
@@ -140,7 +140,7 @@ def get_gender(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/gender/get_gender() *** \n{e}")
-        return jsonify("Server error: This ID could not be parsed to integer!"), 500
+        return jsonify("Server error: This ID could not be parsed to integer!"), 422
     else:
         try:
             cur = get_db().cursor()

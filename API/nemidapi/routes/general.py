@@ -21,7 +21,7 @@ def reset_password():
         created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/reset_password() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling or conversion/hashing!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:
         try:
             cur = get_db().cursor()
@@ -68,7 +68,7 @@ def change_password():
         created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/change_password() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling or conversion/hashing!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:
         try:
             cur = get_db().cursor()
@@ -123,7 +123,7 @@ def authenticate():
         nem_ID = request.json['nemId']
     except Exception as e:
         print(f"*** Error in routes/general/authenticate() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:
         try:
             cur = get_db().cursor()

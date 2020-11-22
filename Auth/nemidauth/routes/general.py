@@ -24,7 +24,7 @@ def login():
         created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/login() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:
         try:
             data = {
@@ -70,7 +70,7 @@ def change_password():
         new_password = str(request.json['newPassword'])
     except Exception as e:
         print(f"*** Error in routes/general/change_password() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:
         try:
             data = {
@@ -100,7 +100,7 @@ def reset_password():
         password = str(request.json['password'])
     except Exception as e:
         print(f"*** Error in routes/general/reset_password() *** \n{e}")
-        return jsonify("Server error: Check JSON spelling!"), 500
+        return jsonify("Server error: Check spelling and data types of request body elements!"), 400
     else:
         try:
             data = {

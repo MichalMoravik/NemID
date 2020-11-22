@@ -121,7 +121,7 @@ def create_loan():
             else:
                 if response.status_code != 200:
                     return jsonify("Error: The loan amount cannot be higher than 75% " \
-                        "of current holdings!"), 403
+                        "of current assets!"), 403
                 
                 # new amount is the old (current) amount of money on the account plus the loan
                 new_amount = old_amount + loan_amount
@@ -144,3 +144,59 @@ def create_loan():
         else:
             return jsonify({"msg": "Operation successfully performed and recorded!", 
                             "newAmount": str(new_amount)}), 201
+            
+
+@app.route('/pay-loan', methods=['POST'])
+def pay_loan():
+    try:
+        loan_id = int(request.json['loanId'])
+        bank_user_id = int(request.json['bankUserId'])
+        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+    except Exception as e:
+        print(f"*** Error in routes/general/create_loan() *** \n{e}")
+        return jsonify("Check spelling and data types of request body elements!"), 400
+    else:
+        try:
+            cur = get_db().cursor()
+            
+            # find out if the specified loan exists and obtain its amount
+            cur.execute(f"SELECT Amount FROM Loan WHERE Id=?", (loan_id,))
+            record = cur.fetchone()
+            if record is None:
+                return jsonify(f'A loan with id: {loan_id} does not exist!'), 404
+            loan_amount = dict(record)['Amount']
+            
+            # find out if the specified bank user exists and obtain user's current amount
+            cur.execute(f"SELECT Amount FROM Account WHERE BankUserId=?", (bank_user_id,))
+            record = cur.fetchone()
+            if record is None:
+                return jsonify(f'An account attached to a bank user ' \
+                            f'with id: {bank_user_id} does not exist!'), 404
+            account_amount = dict(record)['Amount']
+            
+            # return 403 if the user's assets are less than the to-be-paid loan
+            if account_amount < loan_amount:
+                return jsonify("The loan amount cannot be higher than the user's assets!"), 403
+            
+            # the new amount assigned to the account
+            new_amount = account_amount - loan_amount
+            
+            # transaction - turn the loan amount to 0 and substract the amount from the user's account
+            commands = [
+                ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
+                    (modified_at, new_amount, bank_user_id)),
+                ('UPDATE Loan SET ModifiedAt=?, Amount=? WHERE Id=?', 
+                    (modified_at, loan_amount, loan_id))]
+                    
+            for command in commands:
+                cur.execute(command[0], command[1])
+                
+            get_db().commit()
+        except Exception as es:
+            print(f"*** Error in routes/general/pay_loan() *** \n{es}")
+            return jsonify("Server error: Could not successfully perform this operation. " \
+                "Possible database problem"), 500
+        else:
+            return jsonify({"msg": "Operation successfully performed and recorded!", 
+                            "newAccountAmount": str(new_amount)}), 200
+        

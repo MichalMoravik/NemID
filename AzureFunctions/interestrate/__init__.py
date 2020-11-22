@@ -12,4 +12,4 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         interest_rate = 0.02
         # returned amount is a deposited amount + 2% (interest rate) from the deposited amount
         new_amount = deposited_amount + deposited_amount * interest_rate
-        return func.HttpResponse(body=json.dumps({"amountWithInterestRate": new_amount}))
+        return func.HttpResponse(body=json.dumps({"amountWithInterest": new_amount}))

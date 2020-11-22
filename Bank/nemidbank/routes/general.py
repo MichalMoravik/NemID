@@ -130,7 +130,7 @@ def create_loan():
                 commands = [
                     ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
                         (modified_at, new_amount, bank_user_id)),
-                    ('INSERT INTO Loan(BankUserId, CreatedAt, ModifiedAt, Amount) VALUES (?,?,?)', 
+                    ('INSERT INTO Loan(BankUserId, CreatedAt, ModifiedAt, Amount) VALUES (?,?,?,?)', 
                         (bank_user_id, created_at, modified_at, loan_amount))]
                 
                 for command in commands:

@@ -31,7 +31,7 @@ def close_connection(exception):
 @app.route('/borger-user', methods=['POST'])
 def create_borgerUser():
     try:
-        borger_id = str(uuid.uuid4())
+        borger_id = str(request.json['UserId'])
         createdAt_now = str(datetime.datetime.now())
         cur = get_db().cursor()
         cur.execute("INSERT INTO BorgerUser(UserId, CreatedAt) VALUES (?,?)", (borger_id,createdAt_now))
@@ -43,9 +43,9 @@ def create_borgerUser():
 
 #-------------------------------------------------------
 #WORKS!
-@app.route('/borger-user/<id>', methods=['DELETE'])
-def delete_borgerUser(id):
-    borger_id = str(id)
+@app.route('/borger-user', methods=['DELETE'])
+def delete_borgerUser():
+    borger_id = str(request.json['UserId'])
     try:
         cur = get_db().cursor()
         cur.execute(f"SELECT 1 FROM BorgerUser WHERE UserId=?", (borger_id,))
@@ -58,8 +58,8 @@ def delete_borgerUser(id):
             get_db().commit()
             return jsonify(f'User with the ID: {borger_id} has succesfully been deleted!'), 200
     except Exception as e:
-        print(f"*** Error in /borger-user (create new borger) ***: \n{e}")
-        return jsonify("Server error: sorry cant delete the Borger!"), 500
+        print(f"*** Error in /borger-user (Delete borger) ***: \n{e}")
+        return jsonify("Server error: sorry could not delete the Borger!"), 500
 
 #-------------------------------------------------------
 #WORKS!
@@ -182,7 +182,7 @@ def get_borgerAddress():
         cur.execute(f"SELECT * FROM Address WHERE BorgerUserId=? AND isvalid = 1", (borger_id,))
         record = cur.fetchone()
         if record is None:
-            return jsonify(f'No borger with id: {borger_id}, has a valid address!'), 404
+            return jsonify(f'The borger with id: {borger_id}, does not have a valid address or the borger is not in the system!'), 404
         else:
             address = dict(record)
             return json.dumps(address), 200

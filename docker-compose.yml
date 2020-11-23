@@ -1,14 +1,21 @@
 version: '3'
 services:
+    functions:
+      container_name: functions
+      build: ./AzureFunctions/
+      ports:
+      - 8080:80
     bank:
+      container_name: bank
       build: ./Bank/
       ports:
       - 81:33507
       volumes:
       - "./Bank/:/app:rw"
     borger:
+      container_name: borger
       build: ./Borger/
       ports:
-      - 80:33507
+      - 82:33507
       volumes:
       - "./Borger/:/app:rw"

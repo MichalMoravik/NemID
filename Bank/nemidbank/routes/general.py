@@ -49,7 +49,7 @@ def add_deposit():
             
             try:
                 # send the deposited amount to the interest rate function
-                response = requests.post('http://localhost:7071/api/interestrate', json={"amount": amount})
+                response = requests.post('http://functions:80/api/interestrate', json={"amount": amount})
                 # getting back amount plus the interest
                 amount = json.loads(response.content)['amountWithInterest']
             except Exception as e:
@@ -144,7 +144,7 @@ def create_loan():
             
             try:
                 # send the loan amount to the loan algorithm function
-                response = requests.post('http://localhost:7071/api/loanalgorithm', 
+                response = requests.post('http://functions:80/api/loanalgorithm', 
                     json={
                         "amount": loan_amount,
                         "accountAmount": old_amount

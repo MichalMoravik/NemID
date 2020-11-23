@@ -1,9 +1,12 @@
 CREATE TABLE SkatUser (
-    Id INTEGER PRIMARY KEY,
-    UserId TEXT,
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId INT,
     CreatedAt DATETIME,
     IsActive BIT
 )
+
+DROP TABLE SkatUser
+
 
 CREATE TABLE SkatYear (
     Id INTEGER PRIMARY KEY,

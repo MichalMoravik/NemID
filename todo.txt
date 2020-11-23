@@ -3,9 +3,7 @@ Things from requirements plus the following ones:
 - add everywhere UNIQUE 
 - docker
 - Removing BankUser should remove all other tables - add constraints everywhere, also in other folders
-
-BANK:
-- when adding deposit, update money on the bank account too
+- created_at and modified_at can be one row and should be called right before using to give the exact time
 
 SKAT:
 - pay-taxes will call withdrawal endpoint

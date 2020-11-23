@@ -1,11 +1,14 @@
 version: '3'
 services:
-  nemidapi:
-    build: ./NemIDAPI/
-    ports:
-      - 5555:5555
-    volumes:
-    - nemidapi-db:/var/lib/sqlite
-    
-volumes:
-  nemidapi-db:
+    bank:
+      build: ./Bank/
+      ports:
+      - 81:33507
+      volumes:
+      - "./Bank/:/app:rw"
+    borger:
+      build: ./Borger/
+      ports:
+      - 80:33507
+      volumes:
+      - "./Borger/:/app:rw"

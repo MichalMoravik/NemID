@@ -18,9 +18,19 @@ DOCKER!
 1. Build image -> make sure your terminal is in the same folder as the Dockerfile.
 2. run "docker build -t borgersystem/apline:1.0 . "
 3. check your image is there by running "docker images" -> for example borger, it will be named "borgersystem/apline"
-4. now run the image in a container. "docker run -d -p 80:80  borgersystem/apline:1.0" 
+4. now run the image in a container. "docker run -d -p 80:33507  borgersystem/apline:1.0"
+    4.1 When specifying the port - make sure that the second port corrosponds to the
+        port where the flask application is running.
 5. now run "docker ps" and get the container id. 
 6. now run "docker logs <container id> -f"
 7. now try to make http request to your container at http:127.0.0.1/"whatever endpoint".
 ---------------------
+DOCKER COMPOSE
+---------------
+1. make sure your in same directory as the docker-compose.yaml file.
+2. run "docker-compose up"
+3 test endpoints
+    - bank => http://localhost:81/bankuser
+    - borger => http://localhost:80/borger-address
+    
 #############################

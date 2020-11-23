@@ -61,7 +61,7 @@ def add_deposit():
                 "Possible database problem"), 500
         else:
             return jsonify({"msg": "Operation successfully performed and recorded!", 
-                            "newAmount": str(new_amount)}), 201
+                            "newAccountAmount": str(new_amount)}), 201
 
 
 @app.route('/list-deposits/<id>', methods=['GET'])
@@ -186,7 +186,7 @@ def pay_loan():
                 ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
                     (modified_at, new_amount, bank_user_id)),
                 ('UPDATE Loan SET ModifiedAt=?, Amount=? WHERE Id=?', 
-                    (modified_at, loan_amount, loan_id))]
+                    (modified_at, 0, loan_id))]
                     
             for command in commands:
                 cur.execute(command[0], command[1])
@@ -199,4 +199,25 @@ def pay_loan():
         else:
             return jsonify({"msg": "Operation successfully performed and recorded!", 
                             "newAccountAmount": str(new_amount)}), 200
-        
+    
+
+@app.route('/list-loans/<id>', methods=['GET'])
+def list_loans(id):
+    try:
+        bank_user_id = int(id)
+    except Exception as e:
+        print(f"*** Error in routes/general/list_loans() *** \n{e}")
+        return jsonify("Specified Id is invalid and could not be parsed to integer!"), 400
+    else:
+        try:
+            cur = get_db().cursor()
+            cur.execute("SELECT * FROM Loan WHERE BankUserId=? AND Amount > 0", (bank_user_id,))
+            rows = cur.fetchall()
+        except Exception as e:
+            print(f"*** Error in routes/general/list_loans() ***: \n{e}")
+            return jsonify("Server error: Cannot retrieve loans!"), 500
+        else:
+            if rows:
+                loans = [dict(loan) for loan in rows]
+                return json.dumps(loans), 200
+            return jsonify(f'There are no unpaid loans for the user with id: {bank_user_id}!'), 404

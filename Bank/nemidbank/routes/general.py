@@ -8,6 +8,22 @@ import requests
 
 @app.route('/add-deposit', methods=['POST'])
 def add_deposit():
+    """Sends (deposits) assets (money) to the specific bank user's account. The function firstly checks 
+    if the deposited amount is a positive number. 
+    
+    If yes, then the deposited amount is sent to the 'interestrate' serverless function 
+    to calculate the interest amount. 
+    
+    The new amount is formed from the current amount on the account, the deposited amount, and the interest 
+    amount. The user's assets (the amount on the account) are then updated with this new amount.
+    
+    The record containing the deposited amount plus the interest rate is then stored in the Deposit 
+    table.
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If the operation is successful, an updated account amount and a message will be send as a response. 
+    """
     try:
         amount = int(request.json['amount'])
         bank_user_id = int(request.json['bankUserId'])
@@ -32,7 +48,7 @@ def add_deposit():
             old_amount = dict(record)['Amount']
             
             try:
-                # send this amount to the interest rate function
+                # send the deposited amount to the interest rate function
                 response = requests.post('http://localhost:7071/api/interestrate', json={"amount": amount})
                 # getting back amount plus the interest
                 amount = json.loads(response.content)['amountWithInterest']
@@ -66,6 +82,15 @@ def add_deposit():
 
 @app.route('/list-deposits/<id>', methods=['GET'])
 def list_deposits(id):
+    """Lists all deposits. Will select everything from the Deposit table for a particular bank user.
+
+    Args:
+        id: The bank user's id. Taken from the route URL e.g. list-deposits/1
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, a JSON array of all deposits will be returned as a response.
+    """
     try:
         bank_user_id = int(id)
     except Exception as e:
@@ -88,6 +113,16 @@ def list_deposits(id):
         
 @app.route('/create-loan', methods=['POST'])
 def create_loan():
+    """Creates a loan. Takes the loan amount and the bank user id as a request body elements
+    and registers a new loan by storing it is a database. 
+    
+    The loan amount and the current user's assets (amount of money on account) are sent to 
+    a serverless function 'loanalgorithm' to find out if the user is permitted to take the loan.
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If the operation is successful, an updated account amount and a message will be send as a response. 
+    """
     try:
         loan_amount = int(request.json['loanAmount'])
         bank_user_id = int(request.json['bankUserId'])
@@ -110,10 +145,10 @@ def create_loan():
             try:
                 # send the loan amount to the loan algorithm function
                 response = requests.post('http://localhost:7071/api/loanalgorithm', 
-                                        json={
-                                            "amount": loan_amount,
-                                            "accountAmount": old_amount
-                                            })
+                    json={
+                        "amount": loan_amount,
+                        "accountAmount": old_amount
+                        })
             except Exception as e:
                 print(f"*** Error in routes/general/create_loan() *** \n{e}")
                 return jsonify("Server error: Could not receive a status code " \
@@ -143,11 +178,19 @@ def create_loan():
                 "Possible database problem"), 500
         else:
             return jsonify({"msg": "Operation successfully performed and recorded!", 
-                            "newAmount": str(new_amount)}), 201
+                            "newAccountAmount": str(new_amount)}), 201
             
 
 @app.route('/pay-loan', methods=['POST'])
 def pay_loan():
+    """Pay loan route takes asset's from a specified bank user's account and pays user's loans
+    with that amount. After paying the loan, the to-be-paid amount of loan is set to 0 and the loan
+    amount is withdrawn from the user's account assets.
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If the operation is successful, an updated account amount and a message will be send as a response.
+    """
     try:
         loan_id = int(request.json['loanId'])
         bank_user_id = int(request.json['bankUserId'])
@@ -203,6 +246,16 @@ def pay_loan():
 
 @app.route('/list-loans/<id>', methods=['GET'])
 def list_loans(id):
+    """Lists all loans which has a to-be-paid amount more than 0 (all not yet paid loans) 
+    for the specific bank user. 
+
+    Args:
+        id: The bank user id. It is taken from the route URL e.g. list-loans/1
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If the operation is successful, a JSON array of all, not yet paid, loans is returned.
+    """
     try:
         bank_user_id = int(id)
     except Exception as e:
@@ -221,3 +274,77 @@ def list_loans(id):
                 loans = [dict(loan) for loan in rows]
                 return json.dumps(loans), 200
             return jsonify(f'There are no unpaid loans for the user with id: {bank_user_id}!'), 404
+        
+
+@app.route('/withdraw-money', methods=['POST'])
+def withdraw_money():
+    """Withdraws assets from the user's bank account. Takes the user id (not the bank user id)
+    and the amount to be withdrawn from the request body.
+    
+    Checks if the amount to be withdrawn is a positive number and if the amount 
+    to be withdrawn is higher than the current user's assets (money on the account).
+    
+    If yes, then the assets (amount of money) available on the account are updated 
+    (current assets minus the withdrawn amount).
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If the operation is successful, the current account amount, withdrawn amount,
+        and message will be send as a response. 
+    """
+    try:
+        amount = int(request.json['amount'])
+        user_id = int(request.json['userId'])
+        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+    except Exception as e:
+        print(f"*** Error in routes/general/withdraw_money() *** \n{e}")
+        return jsonify("Check spelling and data types of request body elements!"), 400
+    else:
+        # amount cannot be null or negative
+        if amount <= 0 or amount is None:
+            return jsonify("The amount must be a positive number."), 422
+        
+        try:
+            cur = get_db().cursor()
+            
+            # get the bank user (user's bank user id) with specified user id
+            cur.execute('SELECT Id FROM BankUser WHERE UserId=?', (user_id, ))
+            record = cur.fetchone()
+            if record is None:
+                return jsonify(f'A user with id: {user_id} is not registered in the bank system!'), 404
+            bank_user_id = dict(record)['Id']
+            
+            # find out if the specified bank user exists and obtain user's current amount
+            cur.execute(f"SELECT Amount FROM Account WHERE BankUserId=?", (bank_user_id,))
+            record = cur.fetchone()
+            if record is None:
+                return jsonify(f'An account attached to a bank user ' \
+                            f'with id: {bank_user_id} does not exist!'), 404
+            account_amount = dict(record)['Amount']
+            
+            # amount to be withdrawn cannot be higher than current user's assets
+            if amount > account_amount:
+                return jsonify("The amount to be withdrawn must be lower than current user's assets!"), 422
+            
+            # withdraw the amount
+            new_amount = account_amount - amount
+            cur.execute('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
+                        (modified_at, new_amount, bank_user_id))
+        except Exception as e:
+            print(f"*** Error in routes/general/withdraw_money() ***: \n{e}")
+            return jsonify("Server error: Cannot withdraw the amount. Possible database error."), 500
+        else:
+            if cur.rowcount == 1:
+                try:
+                    get_db().commit()
+                except Exception as e:
+                    print(f"*** Error in routes/general/withdraw_money() ***: \n{e}")
+                    return jsonify("Server error: Cannot withdraw the amount. Possible database error."), 500
+                else:
+                    return jsonify({
+                        'msg': 'The specified amount was withdrawn!',
+                        'amount': amount,
+                        'newAccountAmount': new_amount
+                        }), 200
+            return jsonify(f'A bank user with this id: {bank_user_id} does not have an account!'), 404
+    

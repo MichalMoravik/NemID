@@ -79,7 +79,7 @@ def update_user(id):
     """Updates the user and stores the new data in the database
 
     Args:
-        id: taken from the route URL e.g. ...user/1
+        id: taken from the route URL e.g. user/1
 
     Returns:
         Various json strings and status codes based on different situations
@@ -119,7 +119,7 @@ def delete_user(id):
     """Removes the user from the database
 
     Args:
-        id: taken from the route URL e.g. ...user/1
+        id: taken from the route URL e.g. user/1
 
     Returns:
         Various json strings and status codes based on different situations
@@ -175,7 +175,7 @@ def get_user(id):
     """Pull a specific user from the database
 
     Args:
-        id: taken from the route URL e.g. ...user/1
+        id: taken from the route URL e.g. user/1
 
     Returns:
         Various json strings and status codes based on different situations

@@ -57,7 +57,7 @@ def update_bank_account(id):
     """Updates a bank account with specified Id
 
     Args:
-        id: taken from the route URL e.g. ...account/1
+        id: taken from the route URL e.g. account/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -95,7 +95,7 @@ def delete_bank_account(id):
     """Removes a bank account with specified Id from the database.
 
     Args:
-        id: taken from the route URL e.g. ...account/1
+        id: taken from the route URL e.g. account/1
 
     Returns:
         Various json strings and status codes based on different conditions.

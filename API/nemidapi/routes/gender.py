@@ -39,7 +39,7 @@ def update_gender(id):
     """Updates gender in the database.
 
     Args:
-        id: taken from the route URL e.g. ...gender/1
+        id: taken from the route URL e.g. gender/1
 
     Returns:
         Various json strings and status codes based on different situations
@@ -74,7 +74,7 @@ def delete_gender(id):
     """Removes a gender from the database
 
     Args:
-        id: taken from the route URL e.g. ...gender/1
+        id: taken from the route URL e.g. gender/1
 
     Returns:
         Various json strings and status codes based on different situations
@@ -130,7 +130,7 @@ def get_gender(id):
     """Pulls specific gender from the database.
 
     Args:
-        id: taken from the route URL e.g. ...gender/1
+        id: taken from the route URL e.g. gender/1
 
     Returns:
         Various json strings and status codes based on different situations

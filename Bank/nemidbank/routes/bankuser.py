@@ -44,7 +44,7 @@ def update_bank_user(id):
     """Updates a bank user with specified Id.
 
     Args:
-        id: taken from the route URL e.g. ...bankuser/1
+        id: taken from the route URL e.g. bankuser/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -81,7 +81,7 @@ def delete_bank_user(id):
     """Deletes a bank user with specified Id.
 
     Args:
-        id: taken from the route URL e.g. ...bankuser/1
+        id: taken from the route URL e.g. bankuser/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -137,7 +137,7 @@ def get_bank_user(id):
     """Retrieves a bank user specified by Id.
 
     Args:
-        id: taken from the route URL e.g. ...bankuser/1
+        id: taken from the route URL e.g. bankuser/1
 
     Returns:
         Various json strings and status codes based on different conditions.

@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/csharp,node,java,python,jupyternotebooks,angular,django,dart
 # Edit at https://www.toptal.com/developers/gitignore?templates=csharp,node,java,python,jupyternotebooks,angular,django,dart
 
+# VSCode settings
+.vscode/settings.json
+
 ### Angular ###
 ## Angular ##
 # compiled output

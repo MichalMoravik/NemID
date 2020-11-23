@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "c:\\Users\\patok\\Desktop\\Mandatory\\NemID\\Skat\\Scripts\\python.exe",
+    "python.pythonPath": "/usr/local/bin/python3",
     "azureFunctions.deploySubpath": "AzureFunctions",
     "azureFunctions.scmDoBuildDuringDeployment": true,
     "azureFunctions.pythonVenv": ".venv",

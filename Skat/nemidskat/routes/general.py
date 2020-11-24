@@ -17,8 +17,14 @@ def pay_taxes():
     - The call to the Bank API should be made to substract money from the account
     """
     try:
-        bank_user_id = str(request.json['bankUserId'])
-        amount = int(request.json['amount'])
+        bank_user_id = int(request.json['bankUserId'])
+        #amount = int(request.json['amount'])
+        url ='http://0.0.0.0:81/account/'
+        r = requests.get(url, bank_user_id)
+        print(r)
+        data = r.json()
+        bank_amount = data['amount']
+        print(bank_amount)
     except Exception as e:
         print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -26,20 +32,24 @@ def pay_taxes():
         try: 
             cur=get_db().cursor()
             cur.execute(f'SELECT Amount FROM SkatUserYear WHERE UserId=?', (bank_user_id,))
-            amount=int(cur.fetchone()[0])
+            skat_amount=int(cur.fetchone()[0])
         except Exception as e:
             print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
             return jsonify("Server error: Cannot retrieve Amount!"), 500
         else:
-            if amount > 0:
+            if skat_amount > 0:
                 try:
-                    response = requests.post('http://localhost:7071/api/Skat_Tax_Calculator', json={"amount":amount})
+                    response = requests.post('http://localhost:7071/api/Skat_Tax_Calculator', json={"amount":bank_amount})
+                    data=r.json()
+                    tax_money=data['tax_money']
                 except Exception as e:
                     print(f"*** Error in routes/general/pay-taxes() *** \n{e}")
                     return jsonify("Server error: Could not receive a response from Tax Calculator!"), 500
                 else:
                     try:
-                        cur.execute(f'UPDATE SkatUserYear SET Amount = *not-implemented*, IsPaid = 1 WHERE UserId=?', (bank_user_id,))
+                        #IMPLEMENT PAY TAXES
+                        response = requests.post('http://0.0.0.0:81/withdraw-money', json={"amount":bank_amount, "userId":bank_user_id})
+                        cur.execute(f'UPDATE SkatUserYear SET Amount = 0, IsPaid = 1 WHERE UserId=?', (bank_user_id))
                         get_db().commit()
                         return jsonify({"The operation was completed successfully and SkatUserYear was updated"}), 200
                     except Exception as e:

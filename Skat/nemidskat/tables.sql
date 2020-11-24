@@ -9,13 +9,15 @@ DROP TABLE SkatUser
 
 
 CREATE TABLE SkatYear (
-    Id INTEGER PRIMARY KEY,
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Label TEXT,
     CreatedAt DATETIME,
     ModifiedAt DATETIME,
     StartDate DATETIME,
     EndDate DATETIME
 )
+
+DROP TABLE SkatYear
 
 CREATE TABLE SkatUserYear (
     Id INTEGER PRIMARY KEY,
@@ -25,5 +27,7 @@ CREATE TABLE SkatUserYear (
     IsPaid BIT,
     Amount INTEGER,
     FOREIGN KEY (SkatUserId) REFERENCES SkatUser(Id),
-    FOREIGN KEY (SKatYearId) REFERENCES SKatYear(Id)
+    FOREIGN KEY (SKatYearId) REFERENCES SkatYear(Id)
 )
+
+DROP TABLE SkatUserYear

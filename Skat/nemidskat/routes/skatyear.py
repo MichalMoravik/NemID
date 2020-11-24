@@ -4,6 +4,7 @@ from nemidskat import app
 from nemidskat.dbconfig import get_db
 import json
 
+
 @app.route('/skatyear', methods=['POST'])
 def create_skat_year():
     # Create a new skat year
@@ -12,19 +13,17 @@ def create_skat_year():
         created_at = str(request.json['createdAt'])
         modified_at = str(request.json['modifiedAt'])
         start_date = str(request.json['startDate'])
-        end_date = str(request.json['endDate'])
+        end_date = str(request.json['endDate']) 
     except Exception as e:
         print(f"*** Error in routes/skatyear/create_skat_year() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
             cur = get_db().cursor()
-            
             cur.execute(f"SELECT 1 FROM SkatYear WHERE Label=?", (label,))
             record = cur.fetchone()
             if record is not None:
                 return jsonify(f'Year with label: {label} is already registered in the system!'), 403
-            
             cur.execute('INSERT INTO SkatYear(Label, CreatedAt, ModifiedAt, StartDate, EndDate) VALUES (?,?,?,?,?)', 
                         (label, created_at, modified_at, start_date, end_date))
             get_db().commit()
@@ -32,7 +31,21 @@ def create_skat_year():
             print(f"*** Error in routes/skatyear/create_skat_year() ***: \n{e}")
             return jsonify("Server error: unable to create a new skat year!"), 500
         else:
-            return jsonify(f"A new skat year with label: {label} was successfully registered!"), 201
+           # return jsonify(f"A new skat year with label: {label} was successfully registered!"), 201
+            try:
+                cur.execute(f"SELECT * FROM SkatUser")
+                skatuser_rows = cur.fetchall()
+                cur.execute(f"SELECT Id FROM SkatYear WHERE Label = ?",(label,))
+                skatyear_id = cur.fetchone()[0]
+            except:
+                print(f"*** Error in routes/skatyear/create_skat_year() ***: \n{e}")
+                return jsonify("Server error: unable to select from skatuser or skatyear!"), 404
+            else:
+                if skatuser_rows:
+                    for skatuser in skatuser_rows:
+                        cur.execute(f'INSERT INTO SkatUserYear(SkatUserId, SkatYearId, UserId, IsPaid, Amount) VALUES (?,?,?,?,?)',(int(skatuser[0]), skatyear_id, str(skatuser[1]),0,100))
+                        get_db().commit()    
+                    return jsonify("Skatyear and Skatuseryears insterted according to Skatusers!"),200
 
 
 

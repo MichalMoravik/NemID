@@ -5,6 +5,56 @@ from nemidauth import app
 from nemidauth.dbconfig import get_db
 import json
 import requests
+import random
+
+# HELPERS
+def generate_and_store_token(cursor, auth_attempt_id, nem_id):
+    """Sending request to azure serverless function 'tokengenerator'.
+    If the request is successful and token is generated, then a new Token is added to the Token table
+    and StateId in AuthAttemp is updated to 2 (successful). If the token generation process fails, then
+    StateId in AuthAttemp is updated to 3 (failed).
+
+    Args:
+        cursor (sqlite3 cursor): Cursor from database connection
+        auth_attempt_id (int): Id of the record inside of AuthAttempt table
+        nem_id (int): nemID number taken from the request when logging in
+
+    Returns:
+        Various json strings and status codes based on different situations
+        If successful, then the function proceeds and does not return anything.
+    """
+    try:
+        # send nemID and the nemID code to the tokengenerator serverless function
+        response = requests.post('http://functions:80/api/tokengenerator', json={ "nemId": nem_id })
+        
+        # if the request to tokengenerator went okay and returned 200,
+        # then store generated token in the token table
+        # and change StateId of AuthAttempt table
+        if response.ok:
+            # current datetime
+            created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            # returned generated token
+            generated_token = json.loads(response.content)['token']
+            
+            # transaction - store in token table and change StateId in AuthAttempt to successful (id 2)
+            commands = [
+                ('INSERT INTO Token(AuthAttemptId, Token, CreatedAt) VALUES (?,?,?)',
+                (auth_attempt_id, generated_token, created_at)),
+                ('UPDATE AuthAttempt SET StateId=? WHERE Id=?', (2, auth_attempt_id))
+            ]
+            for command in commands:
+                cursor.execute(command[0], command[1])
+        else:
+            # change StateId of AuthAttempt to failed (id 3)
+            cursor.execute('UPDATE AuthAttempt SET StateId=? WHERE Id=?', (3, auth_attempt_id))
+            return jsonify("Server error in routes/general/login(): Could not generate JWT token!"), 500
+    except Exception as e:
+        # change StateId of AuthAttempt to failed (id 3)
+        cursor.execute('UPDATE AuthAttempt SET StateId=? WHERE Id=?', (3, auth_attempt_id))
+        print(f"*** Error in routes/general/login() *** \n{e}")
+        return jsonify("Server error: Could not receive the response" \
+            "from the 'tokengenerator' serverless function!"), 500
+    
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -21,7 +71,6 @@ def login():
     try:
         nem_id = str(request.json['nemId'])
         password = str(request.json['password'])
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/login() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -31,7 +80,7 @@ def login():
                 'nemId': nem_id,
                 'password': password
             }
-            response = requests.post('http://127.0.0.1:5555/authenticate', json=data)
+            response = requests.post('http://api:83/authenticate', json=data)
         except Exception as e:
             print(f"*** Error in routes/general/login() *** \n{e}")
             return jsonify("Server error: could not login!"), 500
@@ -41,16 +90,29 @@ def login():
                 # then store state and auth attempt in the DB
                 if response.ok:
                     cur = get_db().cursor()
+                    
+                    # generate nemID auth code
+                    generated_code = str(random.randint(100000, 999999))
+                    # current datetime
+                    created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+                    
                     # insert a new auth attempt with pending state (stateId 1) to DB
                     cur.execute('INSERT INTO AuthAttempt(NemId, GeneratedCode, CreatedAt, StateId) VALUES (?,?,?,?)',
-                        (nem_id, "Temporary random words", created_at, 1))
+                        (nem_id, generated_code, created_at, 1))
+                    # getting id of the inserted row
+                    auth_attempt_id = cur.lastrowid
+                    
+                    generate_and_store_token(cur, auth_attempt_id, nem_id)
+                        
+                    # if everything went without problems, commit to DB
                     get_db().commit()
             except Exception as e:
                 # except if database commands failed. The database queries can only be triggered 
-                # if response is "ok" and so this exception could only happen if response is "ok".
+                # if response is "ok" and so this exception is associated with database connection. 
+                # Check the database connection, tables, and rules.
                 print(f"*** Error in routes/general/login() *** \n{e}")
-                print("User was successfully returned but insertion of the AuthAttempt data failed!")
-                return jsonify("Server error: could not login!"), 500
+                print("User was successfully returned but insertion of data in database failed!")
+                return jsonify("Server error: could not login because of database failure!"), 500
             else:
                 return jsonify(json.loads(response.content)), response.status_code
             
@@ -78,7 +140,7 @@ def change_password():
                 'oldPassword': old_password,
                 'newPassword': new_password
             }
-            response = requests.post('http://127.0.0.1:5555/change-password', json=data)
+            response = requests.post('http://api:83/change-password', json=data)
         except Exception as e:
             print(f"*** Error in routes/general/change_password() *** \n{e}")
             return jsonify("Server error: could not change the password!"), 500
@@ -107,7 +169,7 @@ def reset_password():
                 'cpr': cpr,
                 'password': password
             }
-            response = requests.post('http://127.0.0.1:5555/reset-password', json=data)
+            response = requests.post('http://api:83/reset-password', json=data)
         except Exception as e:
             print(f"*** Error in routes/general/reset_password() *** \n{e}")
             return jsonify("Server error: could not reset the password!"), 500

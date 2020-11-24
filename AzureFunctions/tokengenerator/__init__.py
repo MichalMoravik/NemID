@@ -2,7 +2,6 @@ import logging
 import azure.functions as func
 from datetime import datetime, timedelta
 import json
-from jose import jwt
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Token Generator (tokengenerator) - a new request has been registered!')

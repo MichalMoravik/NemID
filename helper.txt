@@ -34,3 +34,7 @@ DOCKER COMPOSE
     - borger => http://localhost:80/borger-address
     
 #############################
+Start Azurefunctions
+- 1. make sure your in parent folder - not in function folder.
+- 2. run "func start --python" - (windows)
+###############################

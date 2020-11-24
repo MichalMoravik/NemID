@@ -19,10 +19,9 @@ def pay_taxes():
     try:
         user_id = int(request.json['userId'])
         #amount = int(request.json['amount'])
-        r = requests.get(f'http://0.0.0.0:81/account/get-amount/{user_id}')
+        r = requests.get(f'http://127.0.0.1:81/account/get-amount/{user_id}')
         data = r.json()
         bank_amount = data['amount']
-        print(bank_amount)
     except Exception as e:
         print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -30,15 +29,16 @@ def pay_taxes():
         try: 
             cur=get_db().cursor()
             cur.execute(f'SELECT Amount FROM SkatUserYear WHERE UserId=?', (user_id,))
-            skat_amount=int(cur.fetchone()[0])
+            skat_amount = int(cur.fetchone()[0])
+            print(skat_amount)
         except Exception as e:
             print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
             return jsonify("Server error: Cannot retrieve Amount!"), 500
         else:
             if skat_amount > 0:
                 try:
-                    response = requests.post('http://localhost:7071/api/Skat_Tax_Calculator', json={"amount":bank_amount})
-                    data=r.json()
+                    response = requests.post('http://127.0.0.1:7071/api/Skat_Tax_Calculator', json={"money":bank_amount})
+                    data=response.json()
                     tax_money=data['tax_money']
                 except Exception as e:
                     print(f"*** Error in routes/general/pay-taxes() *** \n{e}")
@@ -46,7 +46,7 @@ def pay_taxes():
                 else:
                     try:
                         #IMPLEMENT PAY TAXES
-                        response = requests.post('http://0.0.0.0:81/withdraw-money', json={"amount":skat_amount, "userId":user_id})
+                        response = requests.post('http://127.0.0.1:81/withdraw-money', json={"amount":skat_amount, "userId":user_id})
                         cur.execute(f'UPDATE SkatUserYear SET Amount = 0, IsPaid = 1 WHERE UserId=?', (user_id,))
                         get_db().commit()
                         return jsonify({"The operation was completed successfully and SkatUserYear was updated"}), 200
@@ -54,7 +54,7 @@ def pay_taxes():
                         print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
                         return jsonify("Server error: Cannot retrieve Amount!"), 500
             else:
-                return jsonify({"All the taxes have been paid"}), 201
+                return jsonify("All the taxes have been paid"), 201
 
 
 

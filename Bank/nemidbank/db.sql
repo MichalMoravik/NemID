@@ -33,6 +33,10 @@ CREATE TABLE [Deposit](
     FOREIGN KEY([BankUserId]) REFERENCES [BankUser](Id)
 );
 
+UPDATE Account
+SET BankUserId = 12
+WHERE BankUserId = 1 
+
 
 -- DROP TABLE Account
 -- DROP TABLE BankUser

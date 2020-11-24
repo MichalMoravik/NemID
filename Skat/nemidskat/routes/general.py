@@ -17,11 +17,9 @@ def pay_taxes():
     - The call to the Bank API should be made to substract money from the account
     """
     try:
-        bank_user_id = int(request.json['bankUserId'])
+        user_id = int(request.json['userId'])
         #amount = int(request.json['amount'])
-        url ='http://0.0.0.0:81/account/'
-        r = requests.get(url, bank_user_id)
-        print(r)
+        r = requests.get(f'http://0.0.0.0:81/account/get-amount/{user_id}')
         data = r.json()
         bank_amount = data['amount']
         print(bank_amount)
@@ -31,7 +29,7 @@ def pay_taxes():
     else: 
         try: 
             cur=get_db().cursor()
-            cur.execute(f'SELECT Amount FROM SkatUserYear WHERE UserId=?', (bank_user_id,))
+            cur.execute(f'SELECT Amount FROM SkatUserYear WHERE UserId=?', (user_id,))
             skat_amount=int(cur.fetchone()[0])
         except Exception as e:
             print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
@@ -48,8 +46,8 @@ def pay_taxes():
                 else:
                     try:
                         #IMPLEMENT PAY TAXES
-                        response = requests.post('http://0.0.0.0:81/withdraw-money', json={"amount":bank_amount, "userId":bank_user_id})
-                        cur.execute(f'UPDATE SkatUserYear SET Amount = 0, IsPaid = 1 WHERE UserId=?', (bank_user_id))
+                        response = requests.post('http://0.0.0.0:81/withdraw-money', json={"amount":skat_amount, "userId":user_id})
+                        cur.execute(f'UPDATE SkatUserYear SET Amount = 0, IsPaid = 1 WHERE UserId=?', (user_id,))
                         get_db().commit()
                         return jsonify({"The operation was completed successfully and SkatUserYear was updated"}), 200
                     except Exception as e:

@@ -8,6 +8,10 @@ import json
 @app.route('/skatyear', methods=['POST'])
 def create_skat_year():
     # Create a new skat year
+    """
+    The method takes a body of one Skatyear, check according to label if the skatyear already exists and creates a new skatyear. Then, it takes the id of the created skatyear and also ids of all users
+    as foreign keys and for every entry from the user table, it creates an entry in the SkatUserYear table. The values for IsPaid and Amount in the SkatUserYear will be adjust in the pay-taxes endpoint.
+    """
     try:
         label = str(request.json['label'])
         created_at = str(request.json['createdAt'])

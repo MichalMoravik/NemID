@@ -1,36 +1,43 @@
 version: '3'
 
 services:
-  functions:
-      container_name: functions
-      build: ./AzureFunctions/
-      ports:
-      - 80:80
-  bank:
-      container_name: bank
-      build: ./Bank/
-      ports:
-      - 81:81
-      volumes:
-      - "./Bank/:/app:rw"
-  borger:
-      container_name: borger
-      build: ./Borger/
-      ports:
-      - 82:82
-      volumes:
-      - "./Borger/:/app:rw"
-  api:
-      container_name: api
-      build: ./API/
-      ports:
-      - 83:83
-      volumes:
-      - "./API/:/app:rw"
-  auth:
-      container_name: auth
-      build: ./Auth/
-      ports:
-      - 84:84
-      volumes:
-      - "./Auth/:/app:rw" 
+    functions:
+        container_name: functions
+        build: ./AzureFunctions/
+        ports:
+        - 80:80
+    bank:
+        container_name: bank
+        build: ./Bank/
+        ports:
+        - 81:81
+        volumes:
+        - "./Bank/:/app:rw"
+    borger:
+        container_name: borger
+        build: ./Borger/
+        ports:
+        - 82:82
+        volumes:
+        - "./Borger/:/app:rw"
+    api:
+        container_name: api
+        build: ./API/
+        ports:
+        - 83:83
+        volumes:
+        - "./API/:/app:rw"
+    auth:
+        container_name: auth
+        build: ./Auth/
+        ports:
+        - 84:84
+        volumes:
+        - "./Auth/:/app:rw"
+    skat:
+        container_name: skat
+        build: ./Skat/
+        ports:
+        - 85:85
+        volumes:
+        - "./Skat/:/app:rw"

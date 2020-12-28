@@ -19,7 +19,7 @@ def pay_taxes():
     try:
         user_id = int(request.json['userId'])
         #amount = int(request.json['amount'])
-        r = requests.get(f'http://127.0.0.1:81/account/get-amount/{user_id}')
+        r = requests.get(f'http://bank:81/get-amount/{user_id}')
         data = r.json()
         bank_amount = data['amount']
     except Exception as e:
@@ -37,7 +37,7 @@ def pay_taxes():
         else:
             if skat_amount > 0:
                 try:
-                    response = requests.post('http://127.0.0.1:7071/api/Skat_Tax_Calculator', json={"money":bank_amount})
+                    response = requests.post('http://functions:80/api/Skat_Tax_Calculator', json={"money":bank_amount})
                     data=response.json()
                     tax_money=data['tax_money']
                 except Exception as e:
@@ -46,7 +46,7 @@ def pay_taxes():
                 else:
                     try:
                         #IMPLEMENT PAY TAXES
-                        response = requests.post('http://127.0.0.1:81/withdraw-money', json={"amount":skat_amount, "userId":user_id})
+                        response = requests.post('http://bank:81/withdraw-money', json={"amount":skat_amount, "userId":user_id})
                         cur.execute(f'UPDATE SkatUserYear SET Amount = 0, IsPaid = 1 WHERE UserId=?', (user_id,))
                         get_db().commit()
                         return jsonify({"The operation was completed successfully and SkatUserYear was updated"}), 200

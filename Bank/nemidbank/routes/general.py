@@ -348,3 +348,33 @@ def withdraw_money():
                         }), 200
             return jsonify(f'A bank user with this id: {bank_user_id} does not have an account!'), 404
     
+    
+@app.route('/get-amount/<id>', methods=['GET'])
+def get_amount_by_user_id(id):   
+    """Retrieves the available amount of money by specifying the user id (not bank account id).
+        
+    Args:
+        id: user ID taken from the route URL e.g. get-amount/1
+    
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, returns the amount available on the user's account and 200 status code.
+    """ 
+    try:
+        id = int(id)     
+    except Exception as e:
+        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+    else:
+        try:
+            cur = get_db().cursor()
+            cur.execute("SELECT Id FROM BankUser WHERE UserId=?", (id,))
+            bankUserId = cur.fetchone()['Id']       
+            cur.execute("SELECT Amount FROM Account WHERE BankUserId=?", (bankUserId,))          
+            row = cur.fetchone()
+            amount = dict(row)['Amount']
+            
+        except Exception as e:
+            print(f"*** Error in routes/account/get_amount_by_user_id() ***: \n{e}")
+            return jsonify("Server error: Cannot get the available amount!"), 500
+        else:
+            return jsonify({"amount": amount }), 200

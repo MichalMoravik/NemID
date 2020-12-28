@@ -149,6 +149,9 @@ def get_bank_accounts():
 @app.route('/account/<id>', methods=['GET'])
 def get_bank_account(id):   
     """Retrieves a bank account from the database.
+    
+    Args:
+        id: account ID taken from the route URL e.g. account/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -172,29 +175,3 @@ def get_bank_account(id):
                 return jsonify(f'Bank Account with id {id} does not exists'), 404
             account = dict(row)
             return json.dumps(account), 200
-
-
-@app.route('/account/get-amount/<id>', methods=['GET'])
-def get_amount_by_id(id):   
-    """Retrieves a bank account from the database.
-    Returns:
-        Various json strings and status codes based on different conditions.
-        If successful, returns the account and 200 status code.
-    """ 
-    try:
-        id = int(id)     
-    except Exception as e:
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
-    else:
-        try:
-            cur = get_db().cursor()
-            cur.execute("SELECT UserId FROM BankUser WHERE UserId=?", (id,))
-            userId = cur.fetchone()['UserId']       
-            cur.execute("SELECT Amount FROM Account WHERE BankUserId=?", (userId,))          
-            row = cur.fetchone()
-            amount = dict(row)['Amount']
-            
-        except Exception as e:
-            return jsonify("Server error: Cannot get the bank account!"), 500
-        else:
-            return jsonify({"amount": amount }), 200

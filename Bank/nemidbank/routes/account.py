@@ -17,8 +17,6 @@ def create_bank_account():
         bank_user_id = int(request.json['bankUserId'])
         account_number = str(request.json['accountNo'])
         is_student = int(request.json['isStudent'])
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/account/create_bank_account() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -42,8 +40,10 @@ def create_bank_account():
             if record is not None:
                 return jsonify(f'A bank user with id: {bank_user_id} already has an account!'), 403
             
+            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
             cur.execute('INSERT INTO Account(BankUserId, AccountNo, isStudent, CreatedAt, ModifiedAt, Amount) VALUES (?,?,?,?,?,0)', 
-                (bank_user_id, account_number, is_student, created_at, modified_at))
+                (bank_user_id, account_number, is_student, current_datetime, current_datetime))
             get_db().commit()
         except Exception as e:
             print(f"*** Error in routes/account/create_bank_account() ***: \n{e}")
@@ -64,13 +64,13 @@ def update_bank_account(id):
     """
     try:
         id = int(id)
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         is_student = int(request.json['isStudent'])
     except Exception as e:
         print(f"*** Error in routes/account/update_bank_account() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
+            modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             cur = get_db().cursor()
             
             cur.execute('UPDATE Account SET isStudent=?, ModifiedAt=? WHERE Id=?', 

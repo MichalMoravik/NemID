@@ -32,8 +32,6 @@ def create_user():
     try:
         email = str(request.json['email']).lower()
         cpr = str(request.json['cpr'])
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         gender_id = int(request.json['genderId'])
         nem_ID = generate_nem_ID_number(cpr) 
         password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
@@ -55,15 +53,18 @@ def create_user():
             if record is None:
                 return jsonify(f'Gender with the gender ID: {gender_id} does not exist!'), 404
             
+            # current day and time
+            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
             # transaction - inserts user and password atomically
             # in password insertion, the UserId is found by looking 
             # at the last added and highest Id, which is always the new user.
             commands = [
                 ('INSERT INTO User(Email, NemId, CPR, CreatedAt, ModifiedAt, GenderId) VALUES (?,?,?,?,?,?)', 
-                            (email, nem_ID, cpr, created_at, modified_at, gender_id)),
+                            (email, nem_ID, cpr, current_datetime, current_datetime, gender_id)),
                 ('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) ' \
                 'SELECT ?, User.Id, ?, ? FROM User ORDER BY Id DESC LIMIT 1', 
-                            (password_hash, created_at, 1))]
+                            (password_hash, current_datetime, 1))]
             for command in commands:
                     cur.execute(command[0], command[1])
             get_db().commit()
@@ -87,7 +88,6 @@ def update_user(id):
     try:
         email = str(request.json['email']).lower()
         cpr = str(request.json['cpr']).lower()
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
         gender_id = int(request.json['genderId'])
         nem_ID = generate_nem_ID_number(cpr)
         id = int(id)       
@@ -96,6 +96,9 @@ def update_user(id):
         return jsonify("Check spelling and data types of request body elements!"), 400
     else:  
         try:
+            # current datetime
+            modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
             cur = get_db().cursor()
             cur.execute('UPDATE User SET Email=?, CPR=?, ModifiedAt=?, GenderId=?, NemId=?  WHERE Id=?', 
                         (email, cpr, modified_at, gender_id, nem_ID, id, ))

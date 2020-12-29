@@ -18,7 +18,6 @@ def reset_password():
     try:
         cpr = str(request.json['cpr'])
         password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/reset_password() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -34,6 +33,9 @@ def reset_password():
             selected_user_id = dict(selected_user)["Id"]
                 
             try:
+                # current day and time
+                created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+
                 # transaction - set IsValid to 0 (false) for the old and active password. 
                 # then stores and activates a new hashed password
                 commands = [
@@ -65,7 +67,6 @@ def change_password():
         nem_ID = str(request.json['nemId'])
         old_password_hash = hashlib.sha256(str.encode(request.json['oldPassword'])).hexdigest()
         new_password_hash = hashlib.sha256(str.encode(request.json['newPassword'])).hexdigest()
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/change_password() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -90,6 +91,9 @@ def change_password():
                 return jsonify(f'The old password is not correct!'), 403
             
             try:
+                # current day and time
+                created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+                
                 # Transaction - set IsValid to 0 (false) for the old and active password. 
                 # Inserts the newly created password to the database.
                 commands = [

@@ -15,8 +15,6 @@ def create_bank_user():
     """
     try:
         user_id = str(request.json['userId'])
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/bank-user/create_bank_user() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -29,8 +27,10 @@ def create_bank_user():
             if record is not None:
                 return jsonify(f'User with id: {user_id} is already registered in the system!'), 403
             
+            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
             cur.execute('INSERT INTO BankUser(UserId, CreatedAt, ModifiedAt) VALUES (?,?,?)', 
-                        (user_id, created_at, modified_at))
+                        (user_id, current_datetime, current_datetime))
             get_db().commit()
         except Exception as e:
             print(f"*** Error in routes/bank-user/create_bank_user() ***: \n{e}")
@@ -51,16 +51,16 @@ def update_bank_user(id):
     """
     try:
         id = int(id)
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/bank-user/update_bank_user() ***: \n{e}")
         return jsonify("Server error: Specified id could not be parsed into integer!"), 422 
     else:
         try:
+            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
             cur = get_db().cursor()
             
             cur.execute('UPDATE BankUser SET ModifiedAt=? WHERE Id=?', 
-                        (modified_at, id, ))
+                        (current_datetime, id, ))
         except Exception as e:
             print(f"*** Error in routes/bank-user/update_bank_user() ***: \n{e}")
             return jsonify("Server error: Cannot update the bank user!"), 500

@@ -27,8 +27,6 @@ def add_deposit():
     try:
         amount = int(request.json['amount'])
         bank_user_id = int(request.json['bankUserId'])
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/add_deposit() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -57,6 +55,8 @@ def add_deposit():
                 return jsonify("Server error: Could not receive amount" \
                     "with interest from the 'interestrate' serverless function!"), 500
             else:
+                current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
+                
                 # new amount is the old (current) amount on the account 
                 # plus the new (deposited) amount plus the interest
                 # and rounded to two decimal points
@@ -64,8 +64,8 @@ def add_deposit():
 
                 # transaction - update account with a new amount and insert into deposit table a new record
                 commands = [
-                    ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', (modified_at, new_amount, bank_user_id)),
-                    ('INSERT INTO Deposit(BankUserId, CreatedAt, Amount) VALUES (?,?,?)', (bank_user_id, created_at, amount))]
+                    ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', (current_datetime, new_amount, bank_user_id)),
+                    ('INSERT INTO Deposit(BankUserId, CreatedAt, Amount) VALUES (?,?,?)', (bank_user_id, current_datetime, amount))]
                 
                 for command in commands:
                     cur.execute(command[0], command[1])
@@ -126,8 +126,6 @@ def create_loan():
     try:
         loan_amount = int(request.json['loanAmount'])
         bank_user_id = int(request.json['bankUserId'])
-        created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/create_loan() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -160,13 +158,15 @@ def create_loan():
                 
                 # new amount is the old (current) amount of money on the account plus the loan
                 new_amount = old_amount + loan_amount
+                
+                current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
                     
                 # transaction - update account with a new amount and insert into loan table a new record
                 commands = [
                     ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
-                        (modified_at, new_amount, bank_user_id)),
+                        (current_datetime, new_amount, bank_user_id)),
                     ('INSERT INTO Loan(BankUserId, CreatedAt, ModifiedAt, Amount) VALUES (?,?,?,?)', 
-                        (bank_user_id, created_at, modified_at, loan_amount))]
+                        (bank_user_id, current_datetime, current_datetime, loan_amount))]
                 
                 for command in commands:
                     cur.execute(command[0], command[1])
@@ -194,7 +194,6 @@ def pay_loan():
     try:
         loan_id = int(request.json['loanId'])
         bank_user_id = int(request.json['bankUserId'])
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/create_loan() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -224,12 +223,14 @@ def pay_loan():
             # the new amount assigned to the account
             new_amount = account_amount - loan_amount
             
+            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
             # transaction - turn the loan amount to 0 and substract the amount from the user's account
             commands = [
                 ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
-                    (modified_at, new_amount, bank_user_id)),
+                    (current_datetime, new_amount, bank_user_id)),
                 ('UPDATE Loan SET ModifiedAt=?, Amount=? WHERE Id=?', 
-                    (modified_at, 0, loan_id))]
+                    (current_datetime, 0, loan_id))]
                     
             for command in commands:
                 cur.execute(command[0], command[1])
@@ -295,7 +296,6 @@ def withdraw_money():
     try:
         amount = int(request.json['amount'])
         user_id = int(request.json['userId'])
-        modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
     except Exception as e:
         print(f"*** Error in routes/general/withdraw_money() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -326,10 +326,12 @@ def withdraw_money():
             if amount > account_amount:
                 return jsonify("The amount to be withdrawn must be lower than current user's assets!"), 422
             
+            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
             # withdraw the amount
             new_amount = account_amount - amount
             cur.execute('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
-                        (modified_at, new_amount, bank_user_id))
+                        (current_datetime, new_amount, bank_user_id))
         except Exception as e:
             print(f"*** Error in routes/general/withdraw_money() ***: \n{e}")
             return jsonify("Server error: Cannot withdraw the amount. Possible database error."), 500

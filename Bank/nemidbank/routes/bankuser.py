@@ -14,7 +14,7 @@ def create_bank_user():
         Various json strings and status codes based on different conditions.
     """
     try:
-        user_id = str(request.json['userId'])
+        user_id = int(request.json['userId'])
     except Exception as e:
         print(f"*** Error in routes/bank-user/create_bank_user() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 

@@ -14,8 +14,6 @@ def create_skat_year():
     """
     try:
         label = str(request.json['label'])
-        created_at = str(request.json['createdAt'])
-        modified_at = str(request.json['modifiedAt'])
         start_date = str(request.json['startDate'])
         end_date = str(request.json['endDate']) 
     except Exception as e:
@@ -24,33 +22,46 @@ def create_skat_year():
     else:
         try:
             cur = get_db().cursor()
+            
             cur.execute(f"SELECT 1 FROM SkatYear WHERE Label=?", (label,))
+            
+            # checking if the skat year already exists in the database to prevent multiple same skat years
             record = cur.fetchone()
             if record is not None:
                 return jsonify(f'Year with label: {label} is already registered in the system!'), 403
+            
+            # getting the current datetime
+            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
+            # inserting a new skat year to the database
             cur.execute('INSERT INTO SkatYear(Label, CreatedAt, ModifiedAt, StartDate, EndDate) VALUES (?,?,?,?,?)', 
-                        (label, created_at, modified_at, start_date, end_date))
+                        (label, current_datetime, current_datetime, start_date, end_date))
+            # get id of the inserted row
+            inserted_year_id = cur.lastrowid
+            
+            # select every skat user
+            cur.execute(f"SELECT * FROM SkatUser")
+            skat_users = cur.fetchall()
+        
+            # if there is no skat user in the database, return 404 
+            if len(skat_users) == 0:
+                return jsonify("There are no skat users in the database"), 404
+            
+            # for each skat user, create a new record in SkatUserYear 
+            for skat_user in skat_users:
+                cur.execute(f'INSERT INTO SkatUserYear(SkatUserId, SkatYearId, UserId, IsPaid, Amount) VALUES (?,?,?,?,?)',
+                            (int(skat_user[0]), inserted_year_id, str(skat_user[1]), 0, 0))
+                
+            # commiting at the end serves as transaction END
+            # in sqlite3, all commands executed before .commit() are considered as part of the transaction command
             get_db().commit()
+            
         except Exception as e:
             print(f"*** Error in routes/skatyear/create_skat_year() ***: \n{e}")
             return jsonify("Server error: unable to create a new skat year!"), 500
         else:
-           # return jsonify(f"A new skat year with label: {label} was successfully registered!"), 201
-            try:
-                cur.execute(f"SELECT * FROM SkatUser")
-                skatuser_rows = cur.fetchall()
-                cur.execute(f"SELECT Id FROM SkatYear WHERE Label = ?",(label,))
-                skatyear_id = cur.fetchone()[0]
-            except:
-                print(f"*** Error in routes/skatyear/create_skat_year() ***: \n{e}")
-                return jsonify("Server error: unable to select from skatuser or skatyear!"), 404
-            else:
-                if skatuser_rows:
-                    for skatuser in skatuser_rows:
-                        cur.execute(f'INSERT INTO SkatUserYear(SkatUserId, SkatYearId, UserId, IsPaid, Amount) VALUES (?,?,?,?,?)',(int(skatuser[0]), skatyear_id, str(skatuser[1]),0,100))
-                        get_db().commit()    
-                    return jsonify("Skatyear and Skatuseryears insterted according to Skatusers!"),200
-
+            return jsonify("A new skat year was successfully added. " +
+                        "All skat users were attached to the new skat year."), 200
 
 
 @app.route('/skatyear', methods=['GET'])

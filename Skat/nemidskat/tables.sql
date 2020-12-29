@@ -1,33 +1,30 @@
 CREATE TABLE SkatUser (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    UserId INT,
-    CreatedAt DATETIME,
-    IsActive BIT
-)
-
-DROP TABLE SkatUser
-
+    UserId INTEGER NOT NULL,
+    CreatedAt TEXT NOT NULL,
+    IsActive BOOLEAN NOT NULL CHECK (IsActive IN (0,1))
+);
 
 CREATE TABLE SkatYear (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    Label TEXT,
-    CreatedAt DATETIME,
-    ModifiedAt DATETIME,
-    StartDate DATETIME,
-    EndDate DATETIME
-)
-
-DROP TABLE SkatYear
+    Label TEXT NOT NULL,
+    CreatedAt TEXT NOT NULL,
+    ModifiedAt TEXT NOT NULL,
+    StartDate TEXT NOT NULL,
+    EndDate TEXT NOT NULL
+);
 
 CREATE TABLE SkatUserYear (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     SkatUserId INTEGER NOT NULL,
     SkatYearId INTEGER NOT NULL,
-    UserId TEXT,
-    IsPaid BIT,
-    Amount INTEGER,
+    UserId INTEGER NOT NULL,
+    IsPaid BOOLEAN NOT NULL CHECK (IsPaid IN (0,1)),
+    Amount INTEGER NOT NULL,
     FOREIGN KEY (SkatUserId) REFERENCES SkatUser(Id),
     FOREIGN KEY (SkatYearId) REFERENCES SkatYear(Id)
-)
+);
 
-DROP TABLE SkatUserYear
+DROP TABLE SkatYear;
+DROP TABLE SkatUser;
+DROP TABLE SkatUserYear;

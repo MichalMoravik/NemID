@@ -14,7 +14,7 @@ def create_skat_user():
         If successful, creates the skat user and returns the success message with 201 status code.
     """
     try:
-        user_id = str(request.json['userId'])
+        user_id = int(request.json['userId'])
     except Exception as e:
         print(f"*** Error in routes/skatuser/create_skat_user() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -52,7 +52,7 @@ def update_skat_user(id):
     """
     try:
         id = int(id)
-        user_id = str(request.json['userId'])
+        user_id = int(request.json['userId'])
         is_active = int(request.json['isActive'])
     except Exception as e:
         print(f"*** Error in routes/skatuser/update_skat_user() ***: \n{e}")

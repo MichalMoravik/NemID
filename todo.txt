@@ -1,22 +1,8 @@
-Things from requirements plus the following ones:
-
-- add everywhere UNIQUE 
-- docker
-- Removing BankUser should remove all other tables - add constraints everywhere, also in other folders
+- implement pay-taxes endpoint
+- add everywhere UNIQUE constraint
 - created_at and modified_at can be one row and should be called right before using to give the exact time
-
-SKAT:
-- pay-taxes will call withdrawal endpoint
-
-
-===================================================================
-Mandatory 2  todo.
- 
-SKAT:
-
-BORGER.DK:
-    - So, I wanted the address and the borgeruser to cascade the delete,
-      but since, foreign_key is not enabled by default in sqlite3, there is
-      some problems with that... have to query the database foreach each reference 
-      with the same user id.. It works though! but could be implemented smarter 
-BANK:
+- add cascade constraints + rework temporary cascades implemented in borger part
+- create main system
+- create 3 gateways - one for nemID part, one for bank/skat/borger, and the last one for functions 
+- create wiki
+- create diagram and add to README.md

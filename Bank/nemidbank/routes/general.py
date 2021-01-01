@@ -365,7 +365,7 @@ def get_amount_by_user_id(id):
     try:
         id = int(id)     
     except Exception as e:
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+        return jsonify("Specified ID could not be parsed to integer!"), 422
     else:
         try:
             cur = get_db().cursor()

@@ -7,10 +7,14 @@ import json
 
 @app.route('/skatyear', methods=['POST'])
 def create_skat_year():
-    # Create a new skat year
-    """
-    The method takes a body of one Skatyear, check according to label if the skatyear already exists and creates a new skatyear. Then, it takes the id of the created skatyear and also ids of all users
-    as foreign keys and for every entry from the user table, it creates an entry in the SkatUserYear table. The values for IsPaid and Amount in the SkatUserYear will be adjust in the pay-taxes endpoint.
+    """Creates a new skat year. Checks if the skat year already exists. 
+    If not, then it creates a new record in SkatUserYear (junction) table for each skat user. 
+    It adds "IsPaid" property with an amount to to be paid by each skat user.
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, creates a new skat year and adds all skat users to the created year.
+        After that, returns 201 status code.
     """
     try:
         label = str(request.json['label'])
@@ -53,7 +57,7 @@ def create_skat_year():
                             (int(skat_user[0]), inserted_year_id, str(skat_user[1]), 0, 0))
                 
             # commiting at the end serves as transaction END
-            # in sqlite3, all commands executed before .commit() are considered as part of the transaction command
+            # in sqlite3, all commands executed before .commit() are considered as part of the transaction operation
             get_db().commit()
             
         except Exception as e:
@@ -61,50 +65,42 @@ def create_skat_year():
             return jsonify("Server error: unable to create a new skat year!"), 500
         else:
             return jsonify("A new skat year was successfully added. " +
-                        "All skat users were attached to the new skat year."), 200
-
-
-@app.route('/skatyear', methods=['GET'])
-def get_skat_years():
-    #Get all years
-    try:
-        cur = get_db().cursor()
-        cur.execute("SELECT * FROM SkatYear")
-        rows = cur.fetchall()
-    except Exception as e:
-        print(f"*** Error in routes/skatyear/get_skat_years() ***: \n{e}")
-        return jsonify("Server error: Cannot get skat years!"), 500
-    else: 
-        if rows:
-            years = [dict(year) for year in rows]
-            return json.dumps(years), 200
-        return jsonify(f'There are no skat years in the database!'), 404
-
+                        "All skat users were attached to the new skat year."), 201
 
 
 @app.route('/skatyear/<id>', methods=['PUT'])
 def update_skat_year(id):
-    #Updates a skat year
+    """Updates the skat year with the specified id.
+
+    Args:
+        id (int): skat year ID taken from the route URL e.g. skatyear/1
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, updates the skat year and returns the success message and 200 status code.
+    """
     try:
         id = int(id)
         label = str(request.json['label'])
-        created_at = str(request.json['createdAt'])
-        modified_at = str(request.json['modifiedAt'])
         start_date = str(request.json['startDate'])
         end_date = str(request.json['endDate'])
     except Exception as e:
         print(f"*** Error in routes/skatyear/update_skat_year() ***: \n{e}")
-        return jsonify("Server error: Specified id could not be parsed into integer!"), 422 
+        return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
             cur = get_db().cursor()
             
-            cur.execute('UPDATE SkatYear SET Label=?, CreatedAt=?, ModifiedAt=?, StartDate=?, EndDate=? WHERE Id=?', 
-                        (label, created_at, modified_at, start_date, end_date, id, ))
+            # getting the current datetime
+            modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
+            
+            cur.execute('UPDATE SkatYear SET Label=?, ModifiedAt=?, StartDate=?, EndDate=? WHERE Id=?', 
+                        (label, modified_at, start_date, end_date, id, ))
         except Exception as e:
             print(f"*** Error in routes/skatyear/update_skat_year() ***: \n{e}")
             return jsonify("Server error: Cannot update the skat year!"), 500
         else:
+            # if we successfully updated one (and only one) row, then proceed
             if cur.rowcount == 1:
                 try:
                     get_db().commit()
@@ -116,15 +112,22 @@ def update_skat_year(id):
             return jsonify(f'A skat year with id: {id} does not exists!'), 404
 
 
-
 @app.route('/skatyear/<id>', methods=['DELETE'])
 def delete_skat_year(id):
-    #Deletes a skat year
+    """Deletes the skat year with the specified id.
+
+    Args:
+        id (int): skat user ID taken from the route URL e.g. skatyear/1
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, deletes the skat year and returns the success message and 200 status code.
+    """
     try:
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/skatyear/delete_skat_year() ***: \n{e}")
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+        return jsonify("Specified ID could not be parsed to integer!"), 422
     else:  
         try:
             cur = get_db().cursor()
@@ -144,16 +147,22 @@ def delete_skat_year(id):
             return jsonify(f'Skat year with id {id} does not exists!'), 404
 
 
-
-
 @app.route('/skatyear/<id>', methods=['GET'])
 def get_skat_year(id):    
-    #Gets a skat year by ID
+    """Retrieves a skat year with the specified id from the database.
+
+    Args:
+        id (int): skat year ID taken from the route URL e.g. skatyear/1
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, returns the skat year (JSON) and 200 status code.
+    """
     try:
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/skatyear/get_skat_year() ***: \n{e}")
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+        return jsonify("Specified ID could not be parsed to integer!"), 422
     else:
         try:
             cur = get_db().cursor()
@@ -167,3 +176,25 @@ def get_skat_year(id):
                 return jsonify(f'Skat year with id {id} does not exists'), 404
             year = dict(row)
             return json.dumps(year), 200
+
+
+@app.route('/skatyear', methods=['GET'])
+def get_skat_years():
+    """Retrieves all skat years from the database.
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, returns all the skat years (JSON) and 200 status code.
+    """
+    try:
+        cur = get_db().cursor()
+        cur.execute("SELECT * FROM SkatYear")
+        rows = cur.fetchall()
+    except Exception as e:
+        print(f"*** Error in routes/skatyear/get_skat_years() ***: \n{e}")
+        return jsonify("Server error: Cannot get skat years!"), 500
+    else: 
+        if rows:
+            years = [dict(year) for year in rows]
+            return json.dumps(years), 200
+        return jsonify(f'There are no skat years in the database!'), 404

@@ -56,14 +56,12 @@ def update_skat_user(id):
         is_active = int(request.json['isActive'])
     except Exception as e:
         print(f"*** Error in routes/skatuser/update_skat_user() ***: \n{e}")
-        return jsonify("Server error: Specified id could not be parsed into integer!"), 422 
+        return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
-            cur = get_db().cursor()
-            current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
-            
-            cur.execute('UPDATE SkatUser SET UserId=?, CreatedAt=?, IsActive=? WHERE Id=?', 
-                        (user_id, current_datetime, is_active, id, ))
+            cur = get_db().cursor()            
+            cur.execute('UPDATE SkatUser SET UserId=?, IsActive=? WHERE Id=?', 
+                        (user_id, is_active, id, ))
         except Exception as e:
             print(f"*** Error in routes/skatuser/update_skat_user() ***: \n{e}")
             return jsonify("Server error: Cannot update the skat user!"), 500
@@ -94,7 +92,7 @@ def delete_skat_user(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/skatuser/delete_skat_user() ***: \n{e}")
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+        return jsonify("Specified ID could not be parsed to integer!"), 422
     else:  
         try:
             cur = get_db().cursor()
@@ -129,7 +127,7 @@ def get_skat_user(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/user/get_skat_user() ***: \n{e}")
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+        return jsonify("Specified ID could not be parsed to integer!"), 422
     else:
         try:
             cur = get_db().cursor()

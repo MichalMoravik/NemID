@@ -90,7 +90,7 @@ def delete_bank_user(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/bank-user/delete_bank_user() ***: \n{e}")
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+        return jsonify("Specified ID could not be parsed to integer!"), 422
     else:  
         try:
             cur = get_db().cursor()
@@ -147,7 +147,7 @@ def get_bank_user(id):
         id = int(id)     
     except Exception as e:
         print(f"*** Error in routes/user/get_bank_user() ***: \n{e}")
-        return jsonify("Server error: Specified ID could not be parsed to integer!"), 422
+        return jsonify("Specified ID could not be parsed to integer!"), 422
     else:
         try:
             cur = get_db().cursor()

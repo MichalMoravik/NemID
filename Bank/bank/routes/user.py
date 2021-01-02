@@ -6,7 +6,7 @@ from bank.dbconfig import get_db
 import json
 
 
-@app.route('/bank-user', methods=['POST'])
+@app.route('/user', methods=['POST'])
 def create_bank_user():
     """Creates a new bank user, adds this user to the database.
 
@@ -17,7 +17,7 @@ def create_bank_user():
     try:
         user_id = int(request.json['userId'])
     except Exception as e:
-        print(f"*** Error in routes/bank-user/create_bank_user() ***: \n{e}")
+        print(f"*** Error in routes/user/create_bank_user() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
@@ -34,18 +34,18 @@ def create_bank_user():
                         (user_id, current_datetime, current_datetime))
             get_db().commit()
         except Exception as e:
-            print(f"*** Error in routes/bank-user/create_bank_user() ***: \n{e}")
+            print(f"*** Error in routes/user/create_bank_user() ***: \n{e}")
             return jsonify("Server error: unable to register a new bank user!"), 500
         else:
             return jsonify(f"A new bank user with user id: {user_id} was successfully registered!"), 201
 
 
-@app.route('/bank-user/<id>', methods=['PUT'])
+@app.route('/user/<id>', methods=['PUT'])
 def update_bank_user(id):
     """Updates a bank user with specified Id.
 
     Args:
-        id: taken from the route URL e.g. bankuser/1
+        id: taken from the route URL e.g. user/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -54,7 +54,7 @@ def update_bank_user(id):
     try:
         id = int(id)
     except Exception as e:
-        print(f"*** Error in routes/bank-user/update_bank_user() ***: \n{e}")
+        print(f"*** Error in routes/user/update_bank_user() ***: \n{e}")
         return jsonify("Server error: Specified id could not be parsed into integer!"), 422 
     else:
         try:
@@ -70,16 +70,16 @@ def update_bank_user(id):
             return jsonify(f'A bank user with id: {id} does not exist!'), 404
         
         except Exception as e:
-            print(f"*** Error in routes/bank-user/update_bank_user() ***: \n{e}")
+            print(f"*** Error in routes/user/update_bank_user() ***: \n{e}")
             return jsonify("Server error: Cannot update the bank user!"), 500            
 
 
-@app.route('/bank-user/<id>', methods=['DELETE'])
+@app.route('/user/<id>', methods=['DELETE'])
 def delete_bank_user(id):
     """Deletes a bank user with specified Id.
 
     Args:
-        id: taken from the route URL e.g. bankuser/1
+        id: taken from the route URL e.g. user/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -88,7 +88,7 @@ def delete_bank_user(id):
     try:
         id = int(id)     
     except Exception as e:
-        print(f"*** Error in routes/bank-user/delete_bank_user() ***: \n{e}")
+        print(f"*** Error in routes/user/delete_bank_user() ***: \n{e}")
         return jsonify("Specified ID could not be parsed to integer!"), 422
     else:  
         try:
@@ -105,7 +105,7 @@ def delete_bank_user(id):
             return jsonify("Server error: Cannot delete user!"), 500            
     
 
-@app.route('/bank-user', methods=['GET'])
+@app.route('/user', methods=['GET'])
 def get_bank_users():
     """Retrieves all user from the database.
 
@@ -127,12 +127,12 @@ def get_bank_users():
         return jsonify(f'There are no bank users in the database!'), 404
 
 
-@app.route('/bank-user/<id>', methods=['GET'])
+@app.route('/user/<id>', methods=['GET'])
 def get_bank_user(id):    
     """Retrieves a bank user specified by Id.
 
     Args:
-        id: taken from the route URL e.g. bankuser/1
+        id: taken from the route URL e.g. user/1
 
     Returns:
         Various json strings and status codes based on different conditions.

@@ -30,7 +30,7 @@ DOCKER COMPOSE
 1. make sure your in same directory as the docker-compose.yaml file.
 2. run "docker-compose up"
 3 test endpoints
-    - bank => http://localhost:81/bank-user
+    - bank => http://localhost:81/user
     - borger => http://localhost:80/borger-address
     
 #############################

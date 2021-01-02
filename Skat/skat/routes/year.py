@@ -59,7 +59,7 @@ def get_tax_amount_for_user(start_date_str: str, end_date_str: str, user_id: int
         return 0
 
 
-@app.route('/skatyear', methods=['POST'])
+@app.route('/year', methods=['POST'])
 def create_skat_year():
     """Creates a new skat year. Checks if the skat year already exists. 
     If not, then it creates a new record in SkatUserYear (junction) table for each skat user. 
@@ -75,7 +75,7 @@ def create_skat_year():
         start_date = str(request.json['startDate'])
         end_date = str(request.json['endDate']) 
     except Exception as e:
-        print(f"*** Error in routes/skatyear/create_skat_year() ***: \n{e}")
+        print(f"*** Error in routes/year/create_skat_year() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
@@ -123,19 +123,19 @@ def create_skat_year():
             get_db().commit()
             
         except Exception as e:
-            print(f"*** Error in routes/skatyear/create_skat_year() ***: \n{e}")
+            print(f"*** Error in routes/year/create_skat_year() ***: \n{e}")
             return jsonify("Server error: unable to create a new skat year!"), 500
         else:
             return jsonify("A new skat year was successfully added. " +
                         "All skat users were attached to the new skat year."), 201
             
 
-@app.route('/skatyear/<id>', methods=['PUT'])
+@app.route('/year/<id>', methods=['PUT'])
 def update_skat_year(id):
     """Updates the skat year with the specified id.
 
     Args:
-        id (int): skat year ID taken from the route URL e.g. skatyear/1
+        id (int): skat year ID taken from the route URL e.g. year/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -147,7 +147,7 @@ def update_skat_year(id):
         start_date = str(request.json['startDate'])
         end_date = str(request.json['endDate'])
     except Exception as e:
-        print(f"*** Error in routes/skatyear/update_skat_year() ***: \n{e}")
+        print(f"*** Error in routes/year/update_skat_year() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
@@ -166,16 +166,16 @@ def update_skat_year(id):
             return jsonify(f'A skat year with id: {id} does not exist!'), 404
             
         except Exception as e:
-            print(f"*** Error in routes/skatyear/update_skat_year() ***: \n{e}")
+            print(f"*** Error in routes/year/update_skat_year() ***: \n{e}")
             return jsonify("Server error: Cannot update the skat year!"), 500            
 
 
-@app.route('/skatyear/<id>', methods=['DELETE'])
+@app.route('/year/<id>', methods=['DELETE'])
 def delete_skat_year(id):
     """Deletes the skat year with the specified id.
 
     Args:
-        id (int): skat user ID taken from the route URL e.g. skatyear/1
+        id (int): skat user ID taken from the route URL e.g. year/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -184,7 +184,7 @@ def delete_skat_year(id):
     try:
         id = int(id)     
     except Exception as e:
-        print(f"*** Error in routes/skatyear/delete_skat_year() ***: \n{e}")
+        print(f"*** Error in routes/year/delete_skat_year() ***: \n{e}")
         return jsonify("Specified ID could not be parsed to integer!"), 422
     else:  
         try:
@@ -197,16 +197,16 @@ def delete_skat_year(id):
             return jsonify(f'Skat year with id {id} does not exist!'), 404
         
         except Exception as e:
-            print(f"*** Error in routes/skatyear/delete_skat_year() ***: \n{e}")
+            print(f"*** Error in routes/year/delete_skat_year() ***: \n{e}")
             return jsonify("Server error: Cannot delete the skat year!"), 500
 
 
-@app.route('/skatyear/<id>', methods=['GET'])
+@app.route('/year/<id>', methods=['GET'])
 def get_skat_year(id):    
     """Retrieves a skat year with the specified id from the database.
 
     Args:
-        id (int): skat year ID taken from the route URL e.g. skatyear/1
+        id (int): skat year ID taken from the route URL e.g. year/1
 
     Returns:
         Various json strings and status codes based on different conditions.
@@ -215,7 +215,7 @@ def get_skat_year(id):
     try:
         id = int(id)     
     except Exception as e:
-        print(f"*** Error in routes/skatyear/get_skat_year() ***: \n{e}")
+        print(f"*** Error in routes/year/get_skat_year() ***: \n{e}")
         return jsonify("Specified ID could not be parsed to integer!"), 422
     else:
         try:
@@ -223,8 +223,8 @@ def get_skat_year(id):
             cur.execute("SELECT * FROM SkatYear WHERE Id=?", (id,))
             row = cur.fetchone()
         except Exception as e:
-            print(f"*** Error in routes/skatyear/get_skat_year() ***: \n{e}")
-            return jsonify("Server error: Cannot get skatyear!"), 500
+            print(f"*** Error in routes/year/get_skat_year() ***: \n{e}")
+            return jsonify("Server error: Cannot get year!"), 500
         else:
             if row is None:
                 return jsonify(f'Skat year with id {id} does not exist'), 404
@@ -232,7 +232,7 @@ def get_skat_year(id):
             return json.dumps(year), 200
 
 
-@app.route('/skatyear', methods=['GET'])
+@app.route('/year', methods=['GET'])
 def get_skat_years():
     """Retrieves all skat years from the database.
 
@@ -245,7 +245,7 @@ def get_skat_years():
         cur.execute("SELECT * FROM SkatYear")
         rows = cur.fetchall()
     except Exception as e:
-        print(f"*** Error in routes/skatyear/get_skat_years() ***: \n{e}")
+        print(f"*** Error in routes/year/get_skat_years() ***: \n{e}")
         return jsonify("Server error: Cannot get skat years!"), 500
     else: 
         if rows:

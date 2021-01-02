@@ -13,7 +13,8 @@ def reset_password():
     Deactivates the old password for a user, and creates and stores the new password.
 
     Returns:
-        Various json strings and status codes based on different situations
+        Various json strings and status codes based on different situations.
+        If successful, returns success message and 201 status code.
     """
     try:
         cpr = str(request.json['cpr'])
@@ -61,7 +62,8 @@ def change_password():
     Receives NemID number, old password (for validation), and new password from the request body.
 
     Returns:
-        Various json strings and status codes based on different situations
+        Various json strings and status codes based on different situations.
+        If successful, returns success message and 201 status code.
     """
     try:
         nem_ID = str(request.json['nemId'])
@@ -125,7 +127,7 @@ def authenticate():
 
     Returns:
         Various json strings and status codes based on different situations
-        If successful, the user's data in a form of json are returned.
+        If successful, the user's data in a form of JSON are returned.
     """
     try:
         password = hashlib.sha256(str.encode(request.json['password'])).hexdigest()

@@ -12,6 +12,7 @@ def create_bank_account():
 
     Returns:
         Various json strings and status codes based on different conditions.
+        If successful, returns success message and 201 status code.
     """
     try:
         bank_user_id = int(request.json['bankUserId'])
@@ -61,6 +62,7 @@ def update_bank_account(id):
 
     Returns:
         Various json strings and status codes based on different conditions.
+        If successful, returns success message and 200 status code.
     """
     try:
         id = int(id)
@@ -99,6 +101,7 @@ def delete_bank_account(id):
 
     Returns:
         Various json strings and status codes based on different conditions.
+        If successful, returns success message and 200 status code.
     """
     try:
         id = int(id)     
@@ -130,7 +133,7 @@ def get_bank_accounts():
 
     Returns:
         Various json strings and status codes based on different conditions.
-        If successful, returns all accounts and 200 status code.
+        If successful, returns all accounts (JSON) and 200 status code.
     """
     try:
         cur = get_db().cursor()
@@ -155,7 +158,7 @@ def get_bank_account(id):
 
     Returns:
         Various json strings and status codes based on different conditions.
-        If successful, returns the account and 200 status code.
+        If successful, returns the account (JSON) and 200 status code.
     """ 
     try:
         id = int(id)     

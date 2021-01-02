@@ -27,7 +27,8 @@ def create_user():
     """Creates new user and stores it in the database.
 
     Returns:
-        Various json strings and status codes based on different situations
+        Various json strings and status codes based on different situations.
+        If successful, returns success message and 201 status code.
     """
     try:
         email = str(request.json['email']).lower()
@@ -83,7 +84,8 @@ def update_user(id):
         id: taken from the route URL e.g. user/1
 
     Returns:
-        Various json strings and status codes based on different situations
+        Various json strings and status codes based on different situations.
+        If successful, returns success message and 200 status code.
     """
     try:
         email = str(request.json['email']).lower()
@@ -125,7 +127,8 @@ def delete_user(id):
         id: taken from the route URL e.g. user/1
 
     Returns:
-        Various json strings and status codes based on different situations
+        Various json strings and status codes based on different situations.
+        If successful, returns success message and 200 status code.
     """
     try:
         id = int(id)     
@@ -157,7 +160,7 @@ def get_users():
 
     Returns:
         Various json strings and status codes based on different situations
-        If successful, the users' data in a form of json are returned.
+        If successful, the users' data in a form of JSON are returned.
     """
     try:
         cur = get_db().cursor()
@@ -182,7 +185,7 @@ def get_user(id):
 
     Returns:
         Various json strings and status codes based on different situations
-        If successful, the user's data in a form of json are returned.
+        If successful, the user's data in a form of JSON are returned.
     """
     try:
         id = int(id)     

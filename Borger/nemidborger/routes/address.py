@@ -30,7 +30,7 @@ def create_address():
             if record is None:
                 return jsonify(f'A borger user with id: {borger_user_id} does not exist!'), 404
             
-            # if there is already existing address for this borger user, deactivate it
+            # if there is already existing and active address for this borger user, deactivate it
             cur.execute('UPDATE Address SET IsValid=? WHERE BorgerUserId=? AND IsValid=?', (0, borger_user_id, 1))
             
             # add a new address and active it

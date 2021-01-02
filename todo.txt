@@ -1,4 +1,5 @@
 - implement pay-taxes endpoint
+- check if HTTP methods are right. POST cannot be used in cases when we don't add anything. Instead use e.g. PUT when just updating
 - created_at and modified_at can be one row and should be called right before using to give the exact time
 - add cascade constraints + rework temporary cascades implemented in borger part
 - create main system

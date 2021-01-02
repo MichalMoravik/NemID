@@ -145,7 +145,7 @@ def change_password():
             print(f"*** Error in routes/general/change_password() *** \n{e}")
             return jsonify("Server error: could not change the password!"), 500
         else:
-            return jsonify (json.loads(response.content)), response.status_code
+            return jsonify(json.loads(response.content)), response.status_code
 
 
 @app.route('/reset-password', methods=['POST'])
@@ -174,4 +174,4 @@ def reset_password():
             print(f"*** Error in routes/general/reset_password() *** \n{e}")
             return jsonify("Server error: could not reset the password!"), 500
         else:
-            return jsonify (json.loads(response.content)), response.status_code
+            return jsonify(json.loads(response.content)), response.status_code

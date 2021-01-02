@@ -3,62 +3,62 @@ from datetime import datetime
 from nemidskat import app
 from nemidskat.dbconfig import get_db
 import requests
+import json
 
-
-@app.route('/pay-taxes', methods=['POST'])
+@app.route('/pay-taxes', methods=['PUT'])
 def pay_taxes():
-    """
-        1. takes userId and total amount of the user's bank account (using this userId)
-        2. check if the user already paid his taxes (IsPaid) 
-        3. it will see the amount of money a user has on his account
-        4. it will then send request to the function and calculate how much taxes he has to pay
-        5. after that it takes this calculated taxes from his account and set the "IsPaid" to 1.
-        6. the call to bank API should be made to substract money from the account
-        
-        what if we do it while creating a new skat year, just to look to bank account and count the amount they have to pay 
+    """Will pay user's (specified by userId) taxes for the particular 
+    skat year (specified by skatYearId). This method firstly checks 
+    if the taxes have been already paid. If not, it withdraws money 
+    from the user's account to pay the taxes. 
+
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If the operation is successful, then in SkatUserYear, the IsPaid property
+        for the specified user is turned to 1 (boolean - true) and return 200 status code.
     """
     try:
         user_id = int(request.json['userId'])
-        #amount = int(request.json['amount'])
-        r = requests.get(f'http://bank:81/get-amount/{user_id}')
-        data = r.json()
-        bank_amount = data['amount']
+        # this might be chosen by the user on frontend
+        skat_year_id = int(request.json['skatYearId'])
     except Exception as e:
         print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
     else: 
-        try: 
-            cur=get_db().cursor()
-            cur.execute(f'SELECT Amount FROM SkatUserYear WHERE UserId=?', (user_id,))
-            skat_amount = int(cur.fetchone()[0])
-            print(skat_amount)
-        except Exception as e:
-            print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
-            return jsonify("Server error: Cannot retrieve Amount!"), 500
-        else:
-            if skat_amount > 0:
-                try:
-                    response = requests.post('http://functions:80/api/Skat_Tax_Calculator', json={"money":bank_amount})
-                    data=response.json()
-                    tax_money=data['tax_money']
-                except Exception as e:
-                    print(f"*** Error in routes/general/pay-taxes() *** \n{e}")
-                    return jsonify("Server error: Could not receive a response from Tax Calculator!"), 500
-                else:
-                    try:
-                        #IMPLEMENT PAY TAXES
-                        response = requests.post('http://bank:81/withdraw-money', json={"amount":skat_amount, "userId":user_id})
-                        cur.execute(f'UPDATE SkatUserYear SET Amount = 0, IsPaid = 1 WHERE UserId=?', (user_id,))
-                        get_db().commit()
-                        return jsonify({"The operation was completed successfully and SkatUserYear was updated"}), 200
-                    except Exception as e:
-                        print(f"*** Error in routes/general/pay-taxes() ***: \n{e}")
-                        return jsonify("Server error: Cannot retrieve Amount!"), 500
-            else:
-                return jsonify("All the taxes have been paid"), 201
-
-
-
-                    
-                    
+        try:
+            cur = get_db().cursor()
                         
+            cur.execute('SELECT IsPaid, Amount FROM SkatUserYear WHERE UserId=? AND SkatYearId=?', 
+                        (user_id, skat_year_id))
+            record = cur.fetchone()
+            
+            if record is None:
+                return jsonify(f'There is no skat record with the user ID: {user_id} ' +
+                            f'and the skat year ID: {skat_year_id}'), 404
+            
+            # check if the user has already paid his taxes
+            is_paid = dict(record)['IsPaid']
+            if is_paid == 1:
+                return jsonify("The user has already paid the taxes!"), 200
+            
+            response = requests.post('http://localhost:81/withdraw-money', json={
+                "amount": dict(record)['Amount'],
+                "userId": user_id})
+            
+            # if the amount was withdrawn, then turn IsPaid to 1 (true)
+            if response.ok:
+                cur.execute('UPDATE SkatUserYear SET IsPaid=? WHERE UserId=? AND SkatYearId=?', 
+                            (1, user_id, skat_year_id))
+
+                get_db().commit()
+            # if the withdraw money event was not successful, then return status code and message
+            # from its API to find out where the problem is
+            else:
+                return jsonify(json.loads(response.content)), response.status_code
+            
+        except Exception as e:
+            print(f"*** Error in routes/general/pay_taxes() ***: \n{e}")
+            return jsonify("Server error: unable to pay taxes!"), 500
+        else:
+            return jsonify("User's taxes have been successfully paid!"), 200
+        

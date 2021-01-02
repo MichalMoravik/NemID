@@ -70,8 +70,8 @@ def update_bank_account(id):
         return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
-            modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             cur = get_db().cursor()
+            modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             
             cur.execute('UPDATE Account SET isStudent=?, ModifiedAt=? WHERE Id=?', 
                         (is_student, modified_at, id))

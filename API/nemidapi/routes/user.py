@@ -96,10 +96,10 @@ def update_user(id):
         return jsonify("Check spelling and data types of request body elements!"), 400
     else:  
         try:
+            cur = get_db().cursor()
             # current datetime
             modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             
-            cur = get_db().cursor()
             cur.execute('UPDATE User SET Email=?, CPR=?, ModifiedAt=?, GenderId=?, NemId=?  WHERE Id=?', 
                         (email, cpr, modified_at, gender_id, nem_ID, id, ))
         except Exception as e:

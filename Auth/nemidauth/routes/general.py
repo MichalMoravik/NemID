@@ -31,10 +31,11 @@ def generate_and_store_token(cursor, auth_attempt_id, nem_id):
         # then store generated token in the token table
         # and change StateId of AuthAttempt table
         if response.ok:
-            # current datetime
-            created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             # returned generated token
             generated_token = json.loads(response.content)['token']
+            
+            # current datetime
+            created_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             
             # transaction - store in token table and change StateId in AuthAttempt to successful (id 2)
             commands = [

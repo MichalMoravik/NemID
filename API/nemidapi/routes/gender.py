@@ -23,7 +23,7 @@ def create_gender():
             cur.execute(f"SELECT 1 FROM Gender WHERE Label=?", (label,))
             record = cur.fetchone()
             if record is not None:
-                return jsonify(f'Gender {label} already exists!'), 403
+                return jsonify(f'Gender {label} already exists!'), 200
             
             cur.execute('INSERT INTO Gender(Label) VALUES (?)', (label,))
             get_db().commit()

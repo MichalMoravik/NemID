@@ -86,7 +86,7 @@ def create_skat_year():
             # checking if the skat year already exists in the database to prevent multiple same skat years
             record = cur.fetchone()
             if record is not None:
-                return jsonify(f'Year with label: {label} is already registered in the system!'), 403
+                return jsonify(f'Year with label: {label} is already registered in the system!'), 200
             
             # getting the current datetime
             current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")

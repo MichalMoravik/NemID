@@ -45,7 +45,7 @@ def create_user():
             cur.execute(f"SELECT 1 FROM User WHERE CPR=?", (cpr,))
             record = cur.fetchone()
             if record is not None:
-                return jsonify(f'User with CPR {cpr} already exists!'), 403
+                return jsonify(f'User with CPR {cpr} already exists!'), 200
             
             # check if the assigned gender exists
             cur.execute(f"SELECT 1 FROM Gender WHERE Id=?", (gender_id,))

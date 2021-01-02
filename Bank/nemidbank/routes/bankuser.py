@@ -25,7 +25,7 @@ def create_bank_user():
             cur.execute(f"SELECT 1 FROM BankUser WHERE UserId=?", (user_id,))
             record = cur.fetchone()
             if record is not None:
-                return jsonify(f'User with id: {user_id} is already registered in the system!'), 403
+                return jsonify(f'User with id: {user_id} is already registered in the system!'), 200
             
             current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
             

@@ -34,11 +34,11 @@ def create_bank_account():
             if record is None:
                 return jsonify(f'A bank user with id: {bank_user_id} does not exist!'), 404
             
-            # find out if the bank user already has a bank account. If yes, return 403
+            # find out if the bank user already has a bank account. If yes, return 200
             cur.execute(f"SELECT 1 FROM Account WHERE BankUserId=?", (bank_user_id,))
             record = cur.fetchone()
             if record is not None:
-                return jsonify(f'A bank user with id: {bank_user_id} already has an account!'), 403
+                return jsonify(f'A bank user with id: {bank_user_id} already has an account!'), 200
             
             current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
             

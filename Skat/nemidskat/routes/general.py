@@ -2,19 +2,20 @@ from flask import request, jsonify
 from datetime import datetime
 from nemidskat import app
 from nemidskat.dbconfig import get_db
-import json
 import requests
 
 
 @app.route('/pay-taxes', methods=['POST'])
 def pay_taxes():
     """
-    The method has been started but not completele implemented - I didn't know how to reach out to the total amount that is in the user's bank account and I also
-    didn't manage to call the Tax Calculator function and substract from the account.
-    - The method should take a body with a UserId and the total amount of the user's bank account.
-    - There should be an initial check if the user has paid taxes (check Amount/IsPaid from SkatUserYear)
-    - The call to the Tax Calculator should be made, depending on its response the Amount and IsPaid in SkatUserYear should be updated
-    - The call to the Bank API should be made to substract money from the account
+        1. takes userId and total amount of the user's bank account (using this userId)
+        2. check if the user already paid his taxes (IsPaid) 
+        3. it will see the amount of money a user has on his account
+        4. it will then send request to the function and calculate how much taxes he has to pay
+        5. after that it takes this calculated taxes from his account and set the "IsPaid" to 1.
+        6. the call to bank API should be made to substract money from the account
+        
+        what if we do it while creating a new skat year, just to look to bank account and count the amount they have to pay 
     """
     try:
         user_id = int(request.json['userId'])

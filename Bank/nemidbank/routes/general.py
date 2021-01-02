@@ -64,8 +64,10 @@ def add_deposit():
 
                 # transaction - update account with a new amount and insert into deposit table a new record
                 commands = [
-                    ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', (current_datetime, new_amount, bank_user_id)),
-                    ('INSERT INTO Deposit(BankUserId, CreatedAt, Amount) VALUES (?,?,?)', (bank_user_id, current_datetime, amount))]
+                    ('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
+                    (current_datetime, new_amount, bank_user_id)),
+                    ('INSERT INTO Deposit(BankUserId, CreatedAt, Amount) VALUES (?,?,?)', 
+                    (bank_user_id, current_datetime, amount))]
                 
                 for command in commands:
                     cur.execute(command[0], command[1])
@@ -351,12 +353,12 @@ def withdraw_money():
             return jsonify(f'A bank user with this id: {bank_user_id} does not have an account!'), 404
     
     
-@app.route('/get-amount/<id>', methods=['GET'])
-def get_amount_by_user_id(id):   
+@app.route('/user-holdings/<id>', methods=['GET'])
+def get_holdings_by_user_id(id):   
     """Retrieves the available amount of money by specifying the user id (not bank account id).
         
     Args:
-        id: user ID taken from the route URL e.g. get-amount/1
+        id: user ID taken from the route URL e.g. user-holdings/1
     
     Returns:
         Various json strings and status codes based on different conditions.
@@ -369,14 +371,64 @@ def get_amount_by_user_id(id):
     else:
         try:
             cur = get_db().cursor()
+            
             cur.execute("SELECT Id FROM BankUser WHERE UserId=?", (id,))
-            bankUserId = cur.fetchone()['Id']       
-            cur.execute("SELECT Amount FROM Account WHERE BankUserId=?", (bankUserId,))          
-            row = cur.fetchone()
-            amount = dict(row)['Amount']
+            record = cur.fetchone()
+            
+            if record is None:
+                return jsonify(f'The bank user with user ID: {id} does not exist!'), 404
+            
+            bank_user_id = dict(record)['Id']    
+            cur.execute("SELECT Amount FROM Account WHERE BankUserId=?", (bank_user_id,))          
+            record = cur.fetchone()
+            
+            if record is None:
+                return jsonify(f'Could not fetch the bank account ' + 
+                            f'belonging to the bank user with ID: {bank_user_id}'), 404
+            
+            amount = dict(record)['Amount']
             
         except Exception as e:
-            print(f"*** Error in routes/account/get_amount_by_user_id() ***: \n{e}")
+            print(f"*** Error in routes/account/get_holdings_by_user_id() ***: \n{e}")
             return jsonify("Server error: Cannot get the available amount!"), 500
         else:
             return jsonify({"amount": amount }), 200
+        
+
+@app.route('/user-deposits/<id>', methods=['GET'])
+def list_deposits_by_user_id(id):   
+    """Retrieves all deposits made by the specific user
+        
+    Args:
+        id: user ID (not bankUserId) taken from the route URL e.g. user-deposits/1
+    
+    Returns:
+        Various json strings and status codes based on different conditions.
+        If successful, returns all deposits (only amount and datetime of creation)
+        made by the user and 200 status code.
+    """ 
+    try:
+        id = int(id)     
+    except Exception as e:
+        return jsonify("Specified ID could not be parsed to integer!"), 422
+    else:
+        try:
+            cur = get_db().cursor()
+            cur.execute("SELECT Id FROM BankUser WHERE UserId=?", (id,))
+            record = cur.fetchone()
+            
+            if record is None:
+                return jsonify(f'The bank user with user ID: {id} does not exist!'), 404
+            
+            bank_user_id = dict(record)['Id']       
+            cur.execute("SELECT Amount, CreatedAt FROM Deposit WHERE BankUserId=?", (bank_user_id,))     
+            records = cur.fetchall()
+            
+        except Exception as e:
+            print(f"*** Error in routes/general/list_deposits_by_user_id() ***: \n{e}")
+            return jsonify("Server error: Cannot retrieve deposits!"), 500
+        else:
+            if records:
+                deposits = [dict(deposit) for deposit in records]
+                return json.dumps(deposits), 200
+            return jsonify(f'There are no deposits from the bank user with this id: {bank_user_id}!'), 404

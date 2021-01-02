@@ -1,8 +1,62 @@
 from flask import request, jsonify
 from datetime import datetime
+import requests
 from nemidskat import app
 from nemidskat.dbconfig import get_db
 import json
+
+
+# HELPERS
+def get_tax_amount_for_user(start_date_str: str, end_date_str: str, user_id: int): 
+    """Returns taxes that need to be paid for the specific user (user_id) and
+    in the specific period (between start_date and the end_date)
+
+    Args:
+        start_date_str (str): start date in the string form
+        end_date_str (str): end date in the string form
+        user_id (int): a user id 
+
+    Returns:
+        tax_amount (int): taxes which need to be paid by the user
+    """
+    # make a request to the bank system. Pass user id and get all deposits for that user   
+    r = requests.get(f'http://localhost:81/user-deposits/{user_id}')
+    # if the user has a bank account and 
+    # at least one deposit between the start and end date, then proceed
+    if r.ok:
+        deposits = r.json()
+        # total_deposit_amount is the total amount (all deposits counted) 
+        # between the start and the end date
+        total_deposit_amount = 0
+        
+        for deposit in deposits:
+            # get date and amount of each deposit
+            deposit_date_str = deposit['CreatedAt']
+            deposit_amount = deposit['Amount']
+            # convert the string dates into date form
+            deposit_date = datetime.strptime(deposit_date_str, "%B %d, %Y %I:%M%p")
+            start_date = datetime.strptime(start_date_str, "%B %d, %Y %I:%M%p")
+            end_date = datetime.strptime(end_date_str, "%B %d, %Y %I:%M%p")
+            
+            # check if the date of the deposit is between start and end date,
+            # if yes, add its amount to the total deposit amount
+            if start_date <= deposit_date <= end_date:
+                # count all amounts together
+                total_deposit_amount += deposit_amount
+        
+        # send request with the total_deposit_amount for the specific period
+        # to the serverless function to count the tax
+        response = requests.post('http://localhost:7071/api/skattaxcalculator', json={"money": total_deposit_amount})
+        tax = response.json()
+        # return how much taxes need to be paid
+        tax_amount = tax['tax_money']
+        return tax_amount
+
+    # if the user does not have any deposits or bank account yet
+    # then we suppose the user does not have any income, and so, 
+    # the user doesn't need to pay any taxes (return 0)
+    else:
+        return 0
 
 
 @app.route('/skatyear', methods=['POST'])
@@ -49,12 +103,20 @@ def create_skat_year():
         
             # if there is no skat user in the database, return 404 
             if len(skat_users) == 0:
-                return jsonify("There are no skat users in the database"), 404
+                return jsonify("There are no skat users in the database"), 404            
             
             # for each skat user, create a new record in SkatUserYear 
             for skat_user in skat_users:
+                # get the tax amount a user needs to paid for the period
+                tax_amount = get_tax_amount_for_user(start_date, end_date, skat_user['UserId'])
+                
+                # lambda returns 0 (boolean, is not paid) if the tax_amount is more than 0
+                # if tax_amount is 0, the user doesn't need to pay anything, so
+                # it is automatically considered as paid
+                is_paid = lambda x: 0 if x > 0 else 1
+                
                 cur.execute(f'INSERT INTO SkatUserYear(SkatUserId, SkatYearId, UserId, IsPaid, Amount) VALUES (?,?,?,?,?)',
-                            (int(skat_user[0]), inserted_year_id, str(skat_user[1]), 0, 0))
+                            (int(skat_user['Id']), inserted_year_id, skat_user['UserId'], is_paid(tax_amount), tax_amount))
                 
             # commiting at the end serves as transaction END
             # in sqlite3, all commands executed before .commit() are considered as part of the transaction operation
@@ -66,7 +128,7 @@ def create_skat_year():
         else:
             return jsonify("A new skat year was successfully added. " +
                         "All skat users were attached to the new skat year."), 201
-
+            
 
 @app.route('/skatyear/<id>', methods=['PUT'])
 def update_skat_year(id):

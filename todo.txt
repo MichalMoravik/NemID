@@ -1,8 +1,9 @@
 - implement pay-taxes endpoint
-- add everywhere UNIQUE constraint
 - created_at and modified_at can be one row and should be called right before using to give the exact time
 - add cascade constraints + rework temporary cascades implemented in borger part
 - create main system
 - create 3 gateways - one for nemID part, one for bank/skat/borger, and the last one for functions 
+- change requests to gateway ones
+- add everywhere UNIQUE constraint
 - create wiki
 - create diagram and add to README.md

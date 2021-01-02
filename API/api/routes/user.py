@@ -104,19 +104,15 @@ def update_user(id):
             
             cur.execute('UPDATE User SET Email=?, CPR=?, ModifiedAt=?, GenderId=?, NemId=?  WHERE Id=?', 
                         (email, cpr, modified_at, gender_id, nem_ID, id, ))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'User with id: {id} updated!'), 200
+            return jsonify(f'User with id {id} does not exist!'), 404
+        
         except Exception as e:
             print(f"*** Error in routes/user/update_user() ***: \n{e}")
-            return jsonify("Server error: Cannot update user!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/user/update_user() ***: \n{e}")
-                    return jsonify("Server error: Cannot update user!"), 500
-                else:
-                    return jsonify(f'User with id: {id} updated!'), 200
-            return jsonify(f'User with id {id} does not exist!'), 404
+            return jsonify("Server error: Cannot update user!"), 500            
 
 
 @app.route('/user/<id>', methods=['DELETE'])
@@ -139,19 +135,15 @@ def delete_user(id):
         try:
             cur = get_db().cursor()
             cur.execute("DELETE FROM User WHERE Id=?", (id,))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'User with id: {id} deleted!'), 200
+            return jsonify(f'User with id {id} does not exist!'), 404
+        
         except Exception as e:
             print(f"*** Error in routes/user/delete_user() ***: \n{e}")
-            return jsonify("Server error: Cannot delete user!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/user/delete_user() ***: \n{e}")
-                    return jsonify("Server error: Cannot delete user!"), 500
-                else:
-                    return jsonify(f'User with id: {id} deleted!'), 200
-            return jsonify(f'User with id {id} does not exist!'), 404
+            return jsonify("Server error: Cannot delete user!"), 500            
     
 
 @app.route('/user', methods=['GET'])

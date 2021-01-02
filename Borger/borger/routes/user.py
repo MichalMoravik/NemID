@@ -60,19 +60,15 @@ def delete_user(id):
         try:
             cur = get_db().cursor()
             cur.execute("DELETE FROM BorgerUser WHERE Id=?", (id,))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'Borger user with id: {id} deleted!'), 200
+            return jsonify(f'Borger user with id {id} does not exist!'), 404
+            
         except Exception as e:
             print(f"*** Error in routes/user/delete_user() ***: \n{e}")
-            return jsonify("Server error: Cannot delete the borger user!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/user/delete_user() ***: \n{e}")
-                    return jsonify("Server error: Cannot delete the borger user!"), 500
-                else:
-                    return jsonify(f'Borger user with id: {id} deleted!'), 200
-            return jsonify(f'Borger user with id {id} does not exist!'), 404
+            return jsonify("Server error: Cannot delete the borger user!"), 500            
 
 
 @app.route('/user/<id>', methods=['PUT'])
@@ -96,19 +92,15 @@ def update_user(id):
         try:
             cur = get_db().cursor()
             cur.execute('UPDATE BorgerUser SET UserId=? WHERE Id=?',(user_id, id))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'A borger user with id: {id} was updated!'), 200
+            return jsonify(f'A borger user with id: {id} does not exist!'), 404
+
         except Exception as e:
             print(f"*** Error in routes/user/update_user() ***: \n{e}")
             return jsonify("Server error: Cannot update the borger user!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/user/update_user() ***: \n{e}")
-                    return jsonify("Server error: Cannot update the borger user"), 500
-                else:
-                    return jsonify(f'A borger user with id: {id} was updated!'), 200
-            return jsonify(f'A borger user with id: {id} does not exist!'), 404
 
 
 @app.route('/user/<id>', methods=['GET'])

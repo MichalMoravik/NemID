@@ -334,23 +334,21 @@ def withdraw_money():
             new_amount = account_amount - amount
             cur.execute('UPDATE Account SET ModifiedAt=?, Amount=? WHERE BankUserId=?', 
                         (current_datetime, new_amount, bank_user_id))
+            
+            # if the row was updated then proceed
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify({
+                    'msg': 'The specified amount was withdrawn!',
+                    'amount': amount,
+                    'newAccountAmount': new_amount
+                    }), 200
+            # if the row was not found
+            return jsonify(f'A bank user with this id: {bank_user_id} does not have an account!'), 404
+        
         except Exception as e:
             print(f"*** Error in routes/general/withdraw_money() ***: \n{e}")
-            return jsonify("Server error: Cannot withdraw the amount. Possible database error."), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/general/withdraw_money() ***: \n{e}")
-                    return jsonify("Server error: Cannot withdraw the amount. Possible database error."), 500
-                else:
-                    return jsonify({
-                        'msg': 'The specified amount was withdrawn!',
-                        'amount': amount,
-                        'newAccountAmount': new_amount
-                        }), 200
-            return jsonify(f'A bank user with this id: {bank_user_id} does not have an account!'), 404
+            return jsonify("Server error: Cannot withdraw the amount. Possible database error."), 500            
     
     
 @app.route('/user-holdings/<id>', methods=['GET'])

@@ -67,19 +67,15 @@ def update_address(id):
         try:
             cur = get_db().cursor()            
             cur.execute('UPDATE Address SET Address=? WHERE Id=?', (address, id))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'A borger address with id: {id} has been updated!'), 200
+            return jsonify(f'A borger address with id: {id} does not exist!'), 404
+        
         except Exception as e:
             print(f"*** Error in routes/address/update_address() ***: \n{e}")
-            return jsonify("Server error: Cannot update the address!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/address/update_address() ***: \n{e}")
-                    return jsonify("Server error: Cannot update the borger address!"), 500
-                else:
-                    return jsonify(f'A borger address with id: {id} has been updated!'), 200
-            return jsonify(f'A borger address with id: {id} does not exist!'), 404
+            return jsonify("Server error: Cannot update the address!"), 500            
 
 
 @app.route('/address/<id>', methods=['DELETE'])
@@ -102,19 +98,15 @@ def delete_address(id):
         try:
             cur = get_db().cursor()
             cur.execute("DELETE FROM Address WHERE Id=?", (id,))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'Address with id: {id} deleted!'), 200
+            return jsonify(f'Address with id {id} does not exist!'), 404
+            
         except Exception as e:
             print(f"*** Error in routes/address/delete_address() ***: \n{e}")
-            return jsonify("Server error: Cannot delete the address!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/address/delete_address() ***: \n{e}")
-                    return jsonify("Server error: Cannot delete the address!"), 500
-                else:
-                    return jsonify(f'Address with id: {id} deleted!'), 200
-            return jsonify(f'Address with id {id} does not exist!'), 404
+            return jsonify("Server error: Cannot delete the address!"), 500            
     
 
 @app.route('/address', methods=['GET'])

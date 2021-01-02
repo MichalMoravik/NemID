@@ -158,20 +158,16 @@ def update_skat_year(id):
             
             cur.execute('UPDATE SkatYear SET Label=?, ModifiedAt=?, StartDate=?, EndDate=? WHERE Id=?', 
                         (label, modified_at, start_date, end_date, id, ))
-        except Exception as e:
-            print(f"*** Error in routes/skatyear/update_skat_year() ***: \n{e}")
-            return jsonify("Server error: Cannot update the skat year!"), 500
-        else:
+            
             # if we successfully updated one (and only one) row, then proceed
             if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/skatyear/update_skat_year() ***: \n{e}")
-                    return jsonify("Server error: Cannot update the skat year!"), 500
-                else:
-                    return jsonify(f'A skat year with id: {id} was updated!'), 200
+                get_db().commit()
+                return jsonify(f'A skat year with id: {id} was updated!'), 200
             return jsonify(f'A skat year with id: {id} does not exist!'), 404
+            
+        except Exception as e:
+            print(f"*** Error in routes/skatyear/update_skat_year() ***: \n{e}")
+            return jsonify("Server error: Cannot update the skat year!"), 500            
 
 
 @app.route('/skatyear/<id>', methods=['DELETE'])
@@ -194,19 +190,15 @@ def delete_skat_year(id):
         try:
             cur = get_db().cursor()
             cur.execute("DELETE FROM SkatYear WHERE Id=?", (id,))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'Skat year with id: {id} deleted!'), 200
+            return jsonify(f'Skat year with id {id} does not exist!'), 404
+        
         except Exception as e:
             print(f"*** Error in routes/skatyear/delete_skat_year() ***: \n{e}")
             return jsonify("Server error: Cannot delete the skat year!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/skatyear/delete_skat_year() ***: \n{e}")
-                    return jsonify("Server error: Cannot delete the skat year!"), 500
-                else:
-                    return jsonify(f'Skat year with id: {id} deleted!'), 200
-            return jsonify(f'Skat year with id {id} does not exist!'), 404
 
 
 @app.route('/skatyear/<id>', methods=['GET'])

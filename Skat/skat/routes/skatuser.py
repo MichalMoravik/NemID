@@ -62,19 +62,15 @@ def update_skat_user(id):
             cur = get_db().cursor()            
             cur.execute('UPDATE SkatUser SET UserId=?, IsActive=? WHERE Id=?', 
                         (user_id, is_active, id, ))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'A skat user with id: {id} was updated!'), 200
+            return jsonify(f'A skat user with id: {id} does not exist!'), 404
+            
         except Exception as e:
             print(f"*** Error in routes/skatuser/update_skat_user() ***: \n{e}")
-            return jsonify("Server error: Cannot update the skat user!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/skatuser/update_skat_user() ***: \n{e}")
-                    return jsonify("Server error: Cannot update the skat user!"), 500
-                else:
-                    return jsonify(f'A skat user with id: {id} was updated!'), 200
-            return jsonify(f'A skat user with id: {id} does not exist!'), 404
+            return jsonify("Server error: Cannot update the skat user!"), 500            
 
 
 @app.route('/skatuser/<id>', methods=['DELETE'])
@@ -97,19 +93,15 @@ def delete_skat_user(id):
         try:
             cur = get_db().cursor()
             cur.execute("DELETE FROM SkatUser WHERE Id=?", (id,))
+            
+            if cur.rowcount == 1:
+                get_db().commit()
+                return jsonify(f'Skat user with id: {id} deleted!'), 200
+            return jsonify(f'Skat user with id {id} does not exist!'), 404
+            
         except Exception as e:
             print(f"*** Error in routes/skatuser/delete_skat_user() ***: \n{e}")
             return jsonify("Server error: Cannot delete the skat user!"), 500
-        else:
-            if cur.rowcount == 1:
-                try:
-                    get_db().commit()
-                except Exception as e:
-                    print(f"*** Error in routes/skatuser/delete_skat_user() ***: \n{e}")
-                    return jsonify("Server error: Cannot delete the skat user!"), 500
-                else:
-                    return jsonify(f'Skat user with id: {id} deleted!'), 200
-            return jsonify(f'Skat user with id {id} does not exist!'), 404
 
 
 @app.route('/skatuser/<id>', methods=['GET'])

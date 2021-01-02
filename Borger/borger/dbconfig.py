@@ -1,6 +1,6 @@
 import sqlite3
 from flask import g
-from bank import app
+from borger import app
 
 DATABASE = 'borger/borger.db'
 

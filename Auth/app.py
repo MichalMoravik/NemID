@@ -1,7 +1,6 @@
 # run.py is a module running this application
 # app variable exists in the package, inside __init__.py class
-from nemidauth import app
-import os
+from auth import app
 
 # Run app
 if __name__ == "__main__":

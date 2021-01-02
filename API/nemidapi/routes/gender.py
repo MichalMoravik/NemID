@@ -66,7 +66,7 @@ def update_gender(id):
                     return jsonify("Server error: Cannot update gender!"), 500
                 else:
                     return jsonify(f'Gender with id: {id} updated!'), 200
-            return jsonify(f'Gender with id {id} does not exists!'), 404
+            return jsonify(f'Gender with id {id} does not exist!'), 404
 
 
 @app.route('/gender/<id>', methods=['DELETE'])
@@ -100,7 +100,7 @@ def delete_gender(id):
                     return jsonify("Server error: Cannot delete gender!"), 500
                 else:
                     return jsonify(f'Gender with id: {id} deleted!'), 200
-            return jsonify(f'Gender with id {id} does not exists!'), 404
+            return jsonify(f'Gender with id {id} does not exist!'), 404
     
 
 @app.route('/gender', methods=['GET'])
@@ -151,7 +151,7 @@ def get_gender(id):
             return jsonify("Server error: Cannot get gender!"), 500
         else:
             if row is None:
-                return jsonify(f'Gender with id {id} does not exists'), 404
+                return jsonify(f'Gender with id {id} does not exist'), 404
             gender = dict(row)
             return json.dumps(gender), 200
 

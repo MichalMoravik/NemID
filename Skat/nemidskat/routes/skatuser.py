@@ -74,7 +74,7 @@ def update_skat_user(id):
                     return jsonify("Server error: Cannot update the skat user!"), 500
                 else:
                     return jsonify(f'A skat user with id: {id} was updated!'), 200
-            return jsonify(f'A skat user with id: {id} does not exists!'), 404
+            return jsonify(f'A skat user with id: {id} does not exist!'), 404
 
 
 @app.route('/skatuser/<id>', methods=['DELETE'])
@@ -109,7 +109,7 @@ def delete_skat_user(id):
                     return jsonify("Server error: Cannot delete the skat user!"), 500
                 else:
                     return jsonify(f'Skat user with id: {id} deleted!'), 200
-            return jsonify(f'Skat user with id {id} does not exists!'), 404
+            return jsonify(f'Skat user with id {id} does not exist!'), 404
 
 
 @app.route('/skatuser/<id>', methods=['GET'])
@@ -138,7 +138,7 @@ def get_skat_user(id):
             return jsonify("Server error: Cannot get user!"), 500
         else:
             if row is None:
-                return jsonify(f'Skat user with id {id} does not exists'), 404
+                return jsonify(f'Skat user with id {id} does not exist'), 404
             user = dict(row)
             return json.dumps(user), 200
         

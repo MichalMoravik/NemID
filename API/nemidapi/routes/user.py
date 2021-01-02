@@ -114,7 +114,7 @@ def update_user(id):
                     return jsonify("Server error: Cannot update user!"), 500
                 else:
                     return jsonify(f'User with id: {id} updated!'), 200
-            return jsonify(f'User with id {id} does not exists!'), 404
+            return jsonify(f'User with id {id} does not exist!'), 404
 
 
 @app.route('/user/<id>', methods=['DELETE'])
@@ -148,7 +148,7 @@ def delete_user(id):
                     return jsonify("Server error: Cannot delete user!"), 500
                 else:
                     return jsonify(f'User with id: {id} deleted!'), 200
-            return jsonify(f'User with id {id} does not exists!'), 404
+            return jsonify(f'User with id {id} does not exist!'), 404
     
 
 @app.route('/user', methods=['GET'])
@@ -199,7 +199,7 @@ def get_user(id):
             return jsonify("Server error: Cannot get user!"), 500
         else:
             if row is None:
-                return jsonify(f'User with id {id} does not exists'), 404
+                return jsonify(f'User with id {id} does not exist'), 404
             user = dict(row)
             return json.dumps(user), 200
 

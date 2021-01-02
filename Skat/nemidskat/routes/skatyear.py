@@ -171,7 +171,7 @@ def update_skat_year(id):
                     return jsonify("Server error: Cannot update the skat year!"), 500
                 else:
                     return jsonify(f'A skat year with id: {id} was updated!'), 200
-            return jsonify(f'A skat year with id: {id} does not exists!'), 404
+            return jsonify(f'A skat year with id: {id} does not exist!'), 404
 
 
 @app.route('/skatyear/<id>', methods=['DELETE'])
@@ -206,7 +206,7 @@ def delete_skat_year(id):
                     return jsonify("Server error: Cannot delete the skat year!"), 500
                 else:
                     return jsonify(f'Skat year with id: {id} deleted!'), 200
-            return jsonify(f'Skat year with id {id} does not exists!'), 404
+            return jsonify(f'Skat year with id {id} does not exist!'), 404
 
 
 @app.route('/skatyear/<id>', methods=['GET'])
@@ -235,7 +235,7 @@ def get_skat_year(id):
             return jsonify("Server error: Cannot get skatyear!"), 500
         else:
             if row is None:
-                return jsonify(f'Skat year with id {id} does not exists'), 404
+                return jsonify(f'Skat year with id {id} does not exist'), 404
             year = dict(row)
             return json.dumps(year), 200
 

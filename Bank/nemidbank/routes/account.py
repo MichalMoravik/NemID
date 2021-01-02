@@ -42,7 +42,7 @@ def create_bank_account():
             
             current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
             
-            cur.execute('INSERT INTO Account(BankUserId, AccountNo, isStudent, CreatedAt, ModifiedAt, Amount) VALUES (?,?,?,?,?,0)', 
+            cur.execute('INSERT INTO Account(BankUserId, AccountNo, IsStudent, CreatedAt, ModifiedAt, Amount) VALUES (?,?,?,?,?,0)', 
                 (bank_user_id, account_number, is_student, current_datetime, current_datetime))
             get_db().commit()
         except Exception as e:
@@ -73,7 +73,7 @@ def update_bank_account(id):
             cur = get_db().cursor()
             modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             
-            cur.execute('UPDATE Account SET isStudent=?, ModifiedAt=? WHERE Id=?', 
+            cur.execute('UPDATE Account SET IsStudent=?, ModifiedAt=? WHERE Id=?', 
                         (is_student, modified_at, id))
         except Exception as e:
             print(f"*** Error in routes/account/update_bank_account() ***: \n{e}")
@@ -87,7 +87,7 @@ def update_bank_account(id):
                     return jsonify("Server error: Cannot update the bank account!"), 500
                 else:
                     return jsonify(f'A bank account with id: {id} was updated!'), 200
-            return jsonify(f'A bank account with id: {id} does not exists!'), 404
+            return jsonify(f'A bank account with id: {id} does not exist!'), 404
 
 
 @app.route('/account/<id>', methods=['DELETE'])
@@ -121,7 +121,7 @@ def delete_bank_account(id):
                     return jsonify("Server error: Cannot delete the bank account!"), 500
                 else:
                     return jsonify(f'Bank account with id: {id} deleted!'), 200
-            return jsonify(f'Bank account with id {id} does not exists!'), 404
+            return jsonify(f'Bank account with id {id} does not exist!'), 404
     
 
 @app.route('/account', methods=['GET'])
@@ -172,6 +172,6 @@ def get_bank_account(id):
             return jsonify("Server error: Cannot get the bank account!"), 500
         else:
             if row is None:
-                return jsonify(f'Bank Account with id {id} does not exists'), 404
+                return jsonify(f'Bank Account with id {id} does not exist'), 404
             account = dict(row)
             return json.dumps(account), 200

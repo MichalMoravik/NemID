@@ -77,6 +77,7 @@ def change_password():
             # select user based on NemID and check if exists
             cur.execute("SELECT Id FROM User WHERE NemId=?", (nem_ID,))
             selected_user = cur.fetchone()
+            
             if selected_user is None:
                 return jsonify(f'User with this NemID: {nem_ID} does not exist!'), 404
             selected_user_id = dict(selected_user)["Id"]
@@ -84,9 +85,11 @@ def change_password():
             # check if user's old password matches with the old password taken from the request body
             cur.execute("SELECT PasswordHash FROM Password WHERE UserId=? AND IsValid=?", (selected_user_id,1))
             selected_password = cur.fetchone()
+            
             if selected_password is None:
                 return jsonify(f'User with this NemID: {nem_ID} does not have any active password!'), 404
             selected_password_hash = dict(selected_password)["PasswordHash"]
+            
             if selected_password_hash != old_password_hash.strip():
                 return jsonify(f'The old password is not correct!'), 403
             
@@ -100,8 +103,10 @@ def change_password():
                     ('UPDATE Password SET IsValid=? WHERE UserId=? AND IsValid=?', (0, selected_user_id, 1)),
                     ('INSERT INTO Password(PasswordHash, UserId, CreatedAt, IsValid) VALUES (?,?,?,?)',
                     (new_password_hash, selected_user_id, created_at, 1))]
+                
                 for command in commands:
                     cur.execute(command[0], command[1])
+                    
                 get_db().commit()
             except Exception as e:
                 print(f"*** Error in routes/general/change_password() *** \n{e}")

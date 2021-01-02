@@ -2,6 +2,7 @@
 - DONE - check if HTTP methods are right. POST cannot be used in cases when we don't add anything. Instead use e.g. PUT when just updating
 - DONE - created_at and modified_at can be one row and should be called right before using to give the exact time
 - borger change structure and fix issues
+- add "if successful" to method "return" documentation
 - change names of python modules to clear form (e.g. from nemidborger to borger)
 - change CRUD update and delete, merge try-except-else blocks and remove the last try-except-else block
 - change names of the files like skatyear to year, bankuser to user, also change endpoint names to simple ones (do not change SQL tho)

@@ -77,7 +77,7 @@ def update_bank_account(id):
                         (is_student, modified_at, id))
         except Exception as e:
             print(f"*** Error in routes/account/update_bank_account() ***: \n{e}")
-            return jsonify("Server error: Cannot update the bank user!"), 500
+            return jsonify("Server error: Cannot update the bank account!"), 500
         else:
             if cur.rowcount == 1:
                 try:

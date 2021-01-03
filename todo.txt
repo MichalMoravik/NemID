@@ -7,8 +7,8 @@
 - DONE - change CRUD update and delete, merge try-except-else blocks and remove the last try-except-else block
 - DONE - change names of the files like year to year, user to user, also change endpoint names to simple ones (do not change SQL tho)
 - DONE - add cascade constraints (update and delete), esp. add the borger one, it is required to remove address when user is removed + check if FK-PK references in sql tables are correctly written (maybe they need some name)
-- add authentication to endpoints
-- create gateway - change requests to gateway ones
+- DONE - create gateway 
+- DONE - change routes in requests
 - DONE - add everywhere UNIQUE constraint (No need to add to PK, they are UNIQUE by nature)
 - create wiki
 - create diagram and add to README.md

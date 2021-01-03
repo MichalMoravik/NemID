@@ -9,6 +9,8 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(SKATDATABASE)
         db.row_factory = sqlite3.Row
+        # turn foreign keys on, to make constraints
+        db.cursor().execute("PRAGMA foreign_keys=ON")
     return db
 
 @app.teardown_appcontext

@@ -9,9 +9,10 @@ CREATE TABLE Address (
     Address TEXT NOT NULL,
     CreatedAt TEXT NOT NULL,
     BorgerUserId INTEGER NOT NULL, 
-    IsValid BOOLEAN NOT NULL CHECK (IsValid IN (0,1))
+    IsValid BOOLEAN NOT NULL CHECK (IsValid IN (0,1)),
+    FOREIGN KEY (BorgerUserId) references BorgerUser(Id) ON DELETE CASCADE
 );
 
-drop table Address;
-drop table BorgerUser;
+-- drop table Address;
+-- drop table BorgerUser;
 

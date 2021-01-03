@@ -21,10 +21,10 @@ CREATE TABLE SkatUserYear (
     UserId INTEGER NOT NULL,
     IsPaid BOOLEAN NOT NULL CHECK (IsPaid IN (0,1)),
     Amount INTEGER NOT NULL,
-    FOREIGN KEY (SkatUserId) REFERENCES SkatUser(Id),
-    FOREIGN KEY (SkatYearId) REFERENCES SkatYear(Id)
+    FOREIGN KEY (SkatUserId) REFERENCES SkatUser(Id) ON DELETE CASCADE,
+    FOREIGN KEY (SkatYearId) REFERENCES SkatYear(Id) ON DELETE CASCADE
 );
 
-DROP TABLE SkatYear;
-DROP TABLE SkatUser;
-DROP TABLE SkatUserYear;
+-- DROP TABLE SkatYear;
+-- DROP TABLE SkatUser;
+-- DROP TABLE SkatUserYear;

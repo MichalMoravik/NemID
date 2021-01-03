@@ -81,7 +81,7 @@ def login():
                 'nemId': nem_id,
                 'password': password
             }
-            response = requests.post('http://api:83/authenticate', json=data)
+            response = requests.post('http://nemid:83/authenticate', json=data)
         except Exception as e:
             print(f"*** Error in routes/general/login() *** \n{e}")
             return jsonify("Server error: could not login!"), 500
@@ -141,7 +141,7 @@ def change_password():
                 'oldPassword': old_password,
                 'newPassword': new_password
             }
-            response = requests.post('http://api:83/change-password', json=data)
+            response = requests.post('http://nemid:83/change-password', json=data)
         except Exception as e:
             print(f"*** Error in routes/general/change_password() *** \n{e}")
             return jsonify("Server error: could not change the password!"), 500
@@ -170,7 +170,7 @@ def reset_password():
                 'cpr': cpr,
                 'password': password
             }
-            response = requests.post('http://api:83/reset-password', json=data)
+            response = requests.post('http://nemid:83/reset-password', json=data)
         except Exception as e:
             print(f"*** Error in routes/general/reset_password() *** \n{e}")
             return jsonify("Server error: could not reset the password!"), 500

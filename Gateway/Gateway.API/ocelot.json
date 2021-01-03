@@ -42,6 +42,30 @@
         "DownstreamHostAndPorts": [    
           {    
             "Host": "localhost",    
+            "Port": "83"    
+          }     
+        ],    
+        "UpstreamPathTemplate": "/api/nemid/{route}",    
+        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
+      },
+      {    
+        "DownstreamPathTemplate": "/{route}",    
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [    
+          {    
+            "Host": "localhost",    
+            "Port": "84"    
+          }     
+        ],    
+        "UpstreamPathTemplate": "/api/auth/{route}",    
+        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT"]
+      },
+      {    
+        "DownstreamPathTemplate": "/{route}",    
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [    
+          {    
+            "Host": "localhost",    
             "Port": "85"    
           }     
         ],    

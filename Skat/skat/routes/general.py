@@ -41,7 +41,7 @@ def pay_taxes():
             if is_paid == 1:
                 return jsonify("The user has already paid the taxes!"), 200
             
-            response = requests.post('http://localhost:81/withdraw-money', json={
+            response = requests.post('http://bank:81/withdraw-money', json={
                 "amount": dict(record)['Amount'],
                 "userId": user_id})
             

@@ -20,7 +20,7 @@ def get_tax_amount_for_user(start_date_str: str, end_date_str: str, user_id: int
         tax_amount (int): taxes which need to be paid by the user
     """
     # make a request to the bank system. Pass user id and get all deposits for that user   
-    r = requests.get(f'http://localhost:81/user-deposits/{user_id}')
+    r = requests.get(f'http://bank:81/user-deposits/{user_id}')
     # if the user has a bank account and 
     # at least one deposit between the start and end date, then proceed
     if r.ok:
@@ -46,7 +46,7 @@ def get_tax_amount_for_user(start_date_str: str, end_date_str: str, user_id: int
         
         # send request with the total_deposit_amount for the specific period
         # to the serverless function to count the tax
-        response = requests.post('http://localhost:7071/api/skattaxcalculator', json={"money": total_deposit_amount})
+        response = requests.post('http://functions:80/api/skattaxcalculator', json={"money": total_deposit_amount})
         tax = response.json()
         # return how much taxes need to be paid
         tax_amount = tax['tax_money']

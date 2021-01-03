@@ -20,13 +20,13 @@ services:
         - 82:82
         volumes:
         - "./Borger/:/app:rw"
-    api:
-        container_name: api
-        build: ./API/
+    nemid:
+        container_name: nemid
+        build: ./NemId/
         ports:
         - 83:83
         volumes:
-        - "./API/:/app:rw"
+        - "./NemId/:/app:rw"
     auth:
         container_name: auth
         build: ./Auth/

@@ -13,6 +13,6 @@ CREATE TABLE Address (
     FOREIGN KEY (BorgerUserId) references BorgerUser(Id) ON DELETE CASCADE
 );
 
--- drop table Address;
--- drop table BorgerUser;
+drop table BorgerUser;
+drop table Address;
 

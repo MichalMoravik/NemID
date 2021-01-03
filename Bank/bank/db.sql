@@ -33,7 +33,7 @@ CREATE TABLE Deposit(
     FOREIGN KEY(BankUserId) REFERENCES BankUser(Id) ON DELETE CASCADE
 );
 
--- DROP TABLE Account
--- DROP TABLE BankUser
--- DROP TABLE Loan
--- DROP TABLE Deposit
+DROP TABLE BankUser;
+DROP TABLE Account;
+DROP TABLE Loan;
+DROP TABLE Deposit;

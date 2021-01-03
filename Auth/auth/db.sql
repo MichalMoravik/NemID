@@ -22,6 +22,6 @@ CREATE TABLE State(
 
 -- INSERT INTO State (Label) VALUES ("pending") , ("successful") , ("failed");
 
--- DROP TABLE State;
 -- DROP TABLE AuthAttempt;
+-- DROP TABLE State;
 -- DROP TABLE Token;

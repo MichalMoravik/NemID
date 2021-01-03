@@ -6,7 +6,7 @@
 - DONE - change names of python modules to clear form (e.g. from nemidborger to borger)
 - DONE - change CRUD update and delete, merge try-except-else blocks and remove the last try-except-else block
 - DONE - change names of the files like year to year, user to user, also change endpoint names to simple ones (do not change SQL tho)
-- add cascade constraints (update and delete), esp. add the borger one, it is required to remove address when user is removed + check if FK-PK references in sql tables are correctly written (maybe they need some name)
+- DONE - add cascade constraints (update and delete), esp. add the borger one, it is required to remove address when user is removed + check if FK-PK references in sql tables are correctly written (maybe they need some name)
 - create main system
 - create 3 gateways - one for nemID part, one for bank/skat/borger, and the last one for functions 
 - change requests to gateway ones

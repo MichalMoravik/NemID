@@ -17,7 +17,7 @@ CREATE TABLE AuthAttempt(
 
 CREATE TABLE State(
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    Label TEXT NOT NULL
+    Label TEXT NOT NULL UNIQUE
 );
 
 -- INSERT INTO State (Label) VALUES ("pending") , ("successful") , ("failed");

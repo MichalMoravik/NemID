@@ -2,8 +2,8 @@ from flask import request, jsonify
 from datetime import datetime
 import random
 # from __init__.py file import app - for routes (@app.route)
-from api import app
-from api.dbconfig import get_db
+from nemid import app
+from nemid.dbconfig import get_db
 import json
 import hashlib
 

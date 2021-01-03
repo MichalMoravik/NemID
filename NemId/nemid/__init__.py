@@ -1,6 +1,6 @@
 from flask import Flask
 app = Flask(__name__)
-from api.routes import user, gender, general
+from nemid.routes import user, gender, general
 
 
 

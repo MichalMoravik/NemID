@@ -1,8 +1,8 @@
 import sqlite3
 from flask import g
-from api import app
+from nemid import app
 
-DATABASE = 'api/nemid.db'
+DATABASE = 'nemid/nemid.db'
 
 def get_db():
     db = getattr(g, '_database', None)

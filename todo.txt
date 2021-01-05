@@ -14,5 +14,4 @@
 - create diagram and add to README.md
 
 - DONE - recreate all databases
-- check if all routes work
-- prepare routes in Insomnia
+- check if all routes work + prepare routes in Insomnia

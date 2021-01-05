@@ -1,7 +1,7 @@
 # NemID
 
-The project is a composition of 5 Flask (Python) Rest API servers and Azure functions. All parts are dockerized, and represent 6 different Docker containers.
-The API endpoints in the containers can be hit via Ocelot gateway implemented in C#. 
+The project is a composition of 5 Flask (Python) Rest API servers and Azure functions. All parts are dockerized and represent 6 different Docker containers.
+The API endpoints in the containers can be hit via the Ocelot gateway implemented in C#. 
 
 ![diagram](/diagram.jpg)
 
@@ -13,8 +13,8 @@ The API endpoints in the containers can be hit via Ocelot gateway implemented in
 
 ## Start without containers locally
 
-1. navigate to the server you want to start, create Python virtual environment and install packages
+1. navigate to the server you want to start, create a Python virtual environment and install packages
 1. run <code>python3 app.py</code>
-2. download Azure CLI and run Azure functions <code>func start --python</code>. Alternativelly you can run it via Azure's extension on VSCode
+2. download Azure CLI and run Azure functions <code>func start --python</code>. Alternatively you can run it via Azure's extension on VSCode
 3. try out the endpoints using your rest client (Insomnia/Postman)
 

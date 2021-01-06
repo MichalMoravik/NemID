@@ -3,7 +3,7 @@
 The project is a composition of 5 Flask (Python) Rest API servers and Azure functions. All parts are dockerized and represent 6 different Docker containers.
 The API endpoints in the containers can be hit via the Ocelot gateway implemented in C#. 
 
-![diagram](/diagram.jpg)
+![diagram](/Diagram.jpg)
 
 ## Start containers locally
 

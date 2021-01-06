@@ -118,7 +118,7 @@ def login():
                 return jsonify(json.loads(response.content)), response.status_code
             
 
-@app.route('/change-password', methods=['PUT'])
+@app.route('/change-password', methods=['POST'])
 def change_password():
     """Changes user's password by calling NemID API and passing the data. 
     Receives the NemID number, old password, and the new password as request body elements.

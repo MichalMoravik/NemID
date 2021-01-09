@@ -204,7 +204,7 @@ def pay_loan():
             cur = get_db().cursor()
             
             # find out if the specified loan exists and obtain its amount
-            cur.execute(f"SELECT Amount FROM Loan WHERE Id=?", (loan_id,))
+            cur.execute(f"SELECT Amount FROM Loan WHERE Id=? AND Amount > 0", (loan_id,))
             record = cur.fetchone()
             if record is None:
                 return jsonify(f'A loan with id: {loan_id} does not exist!'), 404
@@ -339,7 +339,7 @@ def withdraw_money():
             if cur.rowcount == 1:
                 get_db().commit()
                 return jsonify({
-                    'msg': 'The specified amount was withdrawn!',
+                    'msg': 'The specified amount has been withdrawn!',
                     'amount': amount,
                     'newAccountAmount': new_amount
                     }), 200

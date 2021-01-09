@@ -20,4 +20,4 @@ The API endpoints in the containers can be hit via the Ocelot gateway implemente
 
 ## API endpoints
 
-All API endpoints can be seen here: [nemid-docs](https://www.michalmoravik.github.io)
+All API endpoints can be seen here: [nemid-docs](https://michalmoravik.github.io/)

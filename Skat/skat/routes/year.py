@@ -115,8 +115,8 @@ def create_skat_year():
                 # it is automatically considered as paid
                 is_paid = lambda x: 0 if x > 0 else 1
                 
-                cur.execute(f'INSERT INTO SkatUserYear(SkatUserId, SkatYearId, IsPaid, Amount) VALUES (?,?,?,?)',
-                            (int(skat_user['Id']), inserted_year_id, is_paid(tax_amount), tax_amount))
+                cur.execute(f'INSERT INTO SkatUserYear(SkatUserId, UserId, SkatYearId, IsPaid, Amount) VALUES (?,?,?,?,?)',
+                            (int(skat_user['Id']), int(skat_user['UserId']), inserted_year_id, is_paid(tax_amount), tax_amount))
                 
             # commiting at the end serves as transaction END
             # in sqlite3, all commands executed before .commit() are considered as part of the transaction operation

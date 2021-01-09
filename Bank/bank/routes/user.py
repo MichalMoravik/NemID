@@ -52,17 +52,18 @@ def update_bank_user(id):
         If successful, returns success message and 200 status code.
     """
     try:
+        user_id = int(request.json['userId'])
         id = int(id)
     except Exception as e:
         print(f"*** Error in routes/user/update_bank_user() ***: \n{e}")
-        return jsonify("Server error: Specified id could not be parsed into integer!"), 422 
+        return jsonify("Check spelling and data types of request body elements!"), 400 
     else:
         try:
             current_datetime = datetime.now().strftime("%B %d, %Y %I:%M%p")
             cur = get_db().cursor()
             
-            cur.execute('UPDATE BankUser SET ModifiedAt=? WHERE Id=?', 
-                        (current_datetime, id, ))
+            cur.execute('UPDATE BankUser SET UserId=?, ModifiedAt=? WHERE Id=?', 
+                        (user_id, current_datetime, id, ))
             
             if cur.rowcount == 1:
                 get_db().commit()

@@ -18,3 +18,6 @@ The API endpoints in the containers can be hit via the Ocelot gateway implemente
 2. download Azure CLI and run Azure functions <code>func start --python</code>. Alternatively you can run it via Azure's extension on VSCode
 3. try out the endpoints using your rest client (Insomnia/Postman)
 
+## API endpoints
+
+All API endpoints can be seen here: [nemid-docs](https://www.michalmoravik.github.io)

@@ -144,8 +144,6 @@ def update_skat_year(id):
     try:
         id = int(id)
         label = str(request.json['label'])
-        start_date = str(request.json['startDate'])
-        end_date = str(request.json['endDate'])
     except Exception as e:
         print(f"*** Error in routes/year/update_skat_year() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -156,8 +154,8 @@ def update_skat_year(id):
             # getting the current datetime
             modified_at = datetime.now().strftime("%B %d, %Y %I:%M%p")
             
-            cur.execute('UPDATE SkatYear SET Label=?, ModifiedAt=?, StartDate=?, EndDate=? WHERE Id=?', 
-                        (label, modified_at, start_date, end_date, id, ))
+            cur.execute('UPDATE SkatYear SET Label=?, ModifiedAt=? WHERE Id=?', 
+                        (label, modified_at, id, ))
             
             # if we successfully updated one (and only one) row, then proceed
             if cur.rowcount == 1:

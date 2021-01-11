@@ -6,6 +6,8 @@ from nemid import app
 from nemid.dbconfig import get_db
 import json
 import hashlib
+import nemid.validations.requestdata as val
+
 
 # HELPERS
 def generate_nem_ID_number(cpr: str):
@@ -31,11 +33,11 @@ def create_user():
         If successful, returns success message and 201 status code.
     """
     try:
-        email = str(request.json['email']).lower()
-        cpr = str(request.json['cpr'])
+        email = val.empty_validation(str(request.json['email']).lower())
+        cpr = val.empty_validation(str(request.json['cpr']))
         gender_id = int(request.json['genderId'])
         nem_ID = generate_nem_ID_number(cpr) 
-        password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
+        password_hash = hashlib.sha256(val.empty_validation(str.encode(request.json['password']))).hexdigest()
     except Exception as e:
         print(f"*** Error in routes/user/create_user() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -88,8 +90,8 @@ def update_user(id):
         If successful, returns success message and 200 status code.
     """
     try:
-        email = str(request.json['email']).lower()
-        cpr = str(request.json['cpr']).lower()
+        email = val.empty_validation(str(request.json['email']).lower())
+        cpr = val.empty_validation(str(request.json['cpr']).lower())
         gender_id = int(request.json['genderId'])
         nem_ID = generate_nem_ID_number(cpr)
         id = int(id)       

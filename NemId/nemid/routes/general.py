@@ -5,6 +5,7 @@ from nemid import app
 from nemid.dbconfig import get_db
 import json
 import hashlib
+import nemid.validations.requestdata as val
 
 
 @app.route('/reset-password', methods=['POST'])
@@ -17,8 +18,8 @@ def reset_password():
         If successful, returns success message and 201 status code.
     """
     try:
-        cpr = str(request.json['cpr'])
-        password_hash = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
+        cpr = val.empty_validation(str(request.json['cpr']))
+        password_hash = hashlib.sha256(val.empty_validation(str.encode(request.json['password']))).hexdigest()
     except Exception as e:
         print(f"*** Error in routes/general/reset_password() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -67,8 +68,8 @@ def change_password():
     """
     try:
         nem_ID = str(request.json['nemId'])
-        old_password_hash = hashlib.sha256(str.encode(request.json['oldPassword'])).hexdigest()
-        new_password_hash = hashlib.sha256(str.encode(request.json['newPassword'])).hexdigest()
+        old_password_hash = hashlib.sha256(val.empty_validation(str.encode(request.json['oldPassword']))).hexdigest()
+        new_password_hash = hashlib.sha256(val.empty_validation(str.encode(request.json['newPassword']))).hexdigest()
     except Exception as e:
         print(f"*** Error in routes/general/change_password() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -93,7 +94,7 @@ def change_password():
             selected_password_hash = dict(selected_password)["PasswordHash"]
             
             if selected_password_hash != old_password_hash.strip():
-                return jsonify(f'The old password is not correct!'), 403
+                return jsonify(f'The old password is not correct!'), 401
             
             try:
                 # current day and time
@@ -130,7 +131,7 @@ def authenticate():
         If successful, the user's data in a form of JSON are returned.
     """
     try:
-        password = hashlib.sha256(str.encode(request.json['password'])).hexdigest()
+        password = hashlib.sha256(val.empty_validation(str.encode(request.json['password']))).hexdigest()
         nem_ID = request.json['nemId']
     except Exception as e:
         print(f"*** Error in routes/general/authenticate() *** \n{e}")
@@ -163,4 +164,4 @@ def authenticate():
             if password == selected_password_hash: 
                 return json.dumps(selected_user), 200
             else:
-                return jsonify("Incorrect password!"), 403
+                return jsonify("Incorrect password!"), 401

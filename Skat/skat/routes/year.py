@@ -4,6 +4,8 @@ import requests
 from skat import app
 from skat.dbconfig import get_db
 import json
+import skat.validations.requestdata as val
+
 
 
 # HELPERS
@@ -71,9 +73,9 @@ def create_skat_year():
         After that, returns 201 status code.
     """
     try:
-        label = str(request.json['label'])
-        start_date = str(request.json['startDate'])
-        end_date = str(request.json['endDate']) 
+        label = val.empty_validation(str(request.json['label']))
+        start_date = val.empty_validation(str(request.json['startDate']))
+        end_date = val.empty_validation(str(request.json['endDate']))
     except Exception as e:
         print(f"*** Error in routes/year/create_skat_year() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -143,7 +145,7 @@ def update_skat_year(id):
     """
     try:
         id = int(id)
-        label = str(request.json['label'])
+        label = val.empty_validation(str(request.json['label']))
     except Exception as e:
         print(f"*** Error in routes/year/update_skat_year() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 

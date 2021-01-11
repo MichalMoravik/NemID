@@ -4,6 +4,7 @@ from datetime import datetime
 from borger import app
 from borger.dbconfig import get_db
 import json
+import borger.validations.requestdata as val
 
 
 @app.route('/address', methods=['POST'])
@@ -16,7 +17,7 @@ def create_address():
     """
     try:
         borger_user_id = int(request.json['borgerUserId'])
-        address = str(request.json['address'])
+        address = val.empty_validation(str(request.json['address']))
     except Exception as e:
         print(f"*** Error in routes/address/create_address() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 
@@ -59,7 +60,7 @@ def update_address(id):
     """
     try:
         id = int(id)
-        address = str(request.json['address'])
+        address = val.empty_validation(str(request.json['address']))
     except Exception as e:
         print(f"*** Error in routes/address/update_address() ***: \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400 

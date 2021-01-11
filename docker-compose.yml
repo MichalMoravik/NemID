@@ -13,7 +13,7 @@ services:
         - 81:81
         volumes:
         - "./Bank/:/app:rw"
-        # add this environment variable to see the console output after running "docker-compose logs -f"
+        # add this env var to see Python console outputs
         environment:
             - PYTHONUNBUFFERED=1
     borger:

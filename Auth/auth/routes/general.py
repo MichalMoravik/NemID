@@ -6,6 +6,8 @@ from auth.dbconfig import get_db
 import json
 import requests
 import random
+import auth.validations.requestdata as val
+
 
 # HELPERS
 def generate_and_store_token(cursor, auth_attempt_id, nem_id):
@@ -70,8 +72,8 @@ def login():
         If successful, the user's data in a form of json are returned.
     """
     try:
-        nem_id = str(request.json['nemId'])
-        password = str(request.json['password'])
+        nem_id = val.empty_validation(str(request.json['nemId']))
+        password = val.empty_validation(str(request.json['password']))
     except Exception as e:
         print(f"*** Error in routes/general/login() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -128,9 +130,9 @@ def change_password():
         These status codes and messages are returned from NemID API response. 
     """
     try:
-        nem_ID = str(request.json['nemId'])
-        old_password = str(request.json['oldPassword'])
-        new_password = str(request.json['newPassword'])
+        nem_ID = val.empty_validation(str(request.json['nemId']))
+        old_password = val.empty_validation(str(request.json['oldPassword']))
+        new_password = val.empty_validation(str(request.json['newPassword']))
     except Exception as e:
         print(f"*** Error in routes/general/change_password() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -159,8 +161,8 @@ def reset_password():
         These status codes and messages are returned from NemID API response. 
     """
     try:
-        cpr = str(request.json['cpr'])
-        password = str(request.json['password'])
+        cpr = val.empty_validation(str(request.json['cpr']))
+        password = val.empty_validation(str(request.json['password']))
     except Exception as e:
         print(f"*** Error in routes/general/reset_password() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400

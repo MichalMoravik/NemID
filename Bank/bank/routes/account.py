@@ -4,7 +4,7 @@ from datetime import datetime
 from bank import app
 from bank.dbconfig import get_db
 import json
-
+import bank.validations.requestdata as val
 
 @app.route('/account', methods=['POST'])
 def create_bank_account():
@@ -16,7 +16,7 @@ def create_bank_account():
     """
     try:
         bank_user_id = int(request.json['bankUserId'])
-        account_number = str(request.json['accountNo'])
+        account_number = val.empty_validation(str(request.json['accountNo']))
         is_student = int(request.json['isStudent'])
     except Exception as e:
         print(f"*** Error in routes/account/create_bank_account() ***: \n{e}")

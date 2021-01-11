@@ -5,7 +5,6 @@ from bank import app
 from bank.dbconfig import get_db
 import json
 
-
 @app.route('/user', methods=['POST'])
 def create_bank_user():
     """Creates a new bank user, adds this user to the database.

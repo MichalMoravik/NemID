@@ -3,6 +3,8 @@ from flask import json
 # from __init__.py file import app - for routes (@app.route)
 from nemid import app
 from nemid.dbconfig import get_db
+import nemid.validations.requestdata as val
+
 
 @app.route('/gender', methods=['POST'])
 def create_gender():
@@ -13,7 +15,7 @@ def create_gender():
         If successful, returns success message and 201 status code.
     """
     try:
-        label = str(request.json['label']).lower()        
+        label = val.empty_validation(str(request.json['label']).lower())     
     except Exception as e:
         print(f"*** Error in routes/gender/create_gender() *** \n{e}")
         return jsonify("Check spelling and data types of request body elements!"), 400
@@ -47,7 +49,7 @@ def update_gender(id):
         If successful, returns success message and 200 status code.
     """
     try:
-        label = str(request.json['label']).lower() 
+        label = val.empty_validation(str(request.json['label']).lower())
         id = int(id)
     except Exception as e:
         print(f"*** Error in routes/gender/update_gender() *** \n{e}")
